@@ -38,7 +38,6 @@ export default function DetalleCocheCliente({ auto }: Props) {
     : 0;
   return (
     <>
-      <Navbar />
 
       <SolicitudReserva
         mostrar={mostrarSolicitudResercva}

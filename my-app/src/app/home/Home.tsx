@@ -49,17 +49,6 @@ export default function HomePage() {
 
   return (
     <div className={styles.container}>
-      <header className={styles.headerTop}>
-        <Navbar 
-          onLoginClick={() => setActiveModal('login')}
-          onRegisterClick={() => setActiveModal('register')}
-        />
-      </header>
-
-      <header className={styles.headerFilters}>
-        <FiltersBar />
-      </header>
-
       <main className={styles.body}>
         <div className={styles.scrollContent}>
           <p>Contenido principal del usuario (tarjetas, información, etc.).</p>

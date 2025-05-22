@@ -1,6 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
+import Navbar from "@/components/navbar/Navbar";
 
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export default function RootLayout({
       <body>
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
           <header>
-          
+            <Navbar/>
           </header>
 
           <main style={{ flexGrow: 1, backgroundColor: '#ffffff' }}>

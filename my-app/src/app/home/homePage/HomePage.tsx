@@ -88,10 +88,6 @@ export default function MainHome() {
         <NavbarInicioSesion onBecomeHost={() => setActiveModal('vehicleData')} />
       </header>
 
-      <header className="/* headerFilters */">
-        <FiltersBar />
-      </header>
-
       <main className="flex-grow p-8">
         <div className="/* scrollContent */">
           <p>Contenido principal del usuario (tarjetas, información, etc.).</p>

@@ -23,9 +23,9 @@ export default function UserPerfilPage() {
   const [campoEnEdicion, setCampoEnEdicion] = useState<string | null>(null); // 👈 NUEVO
 
   useEffect(() => {
-    if (user?.foto_perfil) {
-      setImagePreviewUrl(`http://34.69.214.55:3001${user.foto_perfil}`);
-      console.log('✅ Foto cargada:', `http://34.69.214.55:3001${user.foto_perfil}`);
+    if (user?.fotoPerfil) {
+      setImagePreviewUrl(`http://34.69.214.55:3001${user.fotoPerfil}`);
+      console.log('✅ Foto cargada:', `http://34.69.214.55:3001${user.fotoPerfil}`);
     }
   }, [user]);
 
@@ -65,9 +65,9 @@ export default function UserPerfilPage() {
               {/* Input Nombre */}
               {user && (
                 <NombreEditable
-                  initialValue={user.nombre_completo}
-                  campoEnEdicion={campoEnEdicion} // 👈 NUEVO
-                  setCampoEnEdicion={setCampoEnEdicion} // 👈 NUEVO
+                  initialValue={user.nombreCompleto}
+                  campoEnEdicion={campoEnEdicion} 
+                  setCampoEnEdicion={setCampoEnEdicion} 
                 />
               )}
 
@@ -90,7 +90,7 @@ export default function UserPerfilPage() {
                     label="Fecha de Nacimiento"
                     type="date"
                     icono={<CalendarIcon />}
-                    defaultValue={user?.fecha_nacimiento?.split('T')[0] || ''}
+                    defaultValue={user?.fechaNacimiento?.split('T')[0] || ''}
                     className="focus:ring-[var(--azul-oscuro)] border-[var(--azul-oscuro)] border-2 font-bold"
                     readOnly={true}
                   />

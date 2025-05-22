@@ -12,6 +12,7 @@ import RegisterModal from '@/components/auth/authregistro/RegisterModal';
 import VehicleDataModal from '@/components/auth/authRegistroHost/VehicleDataModal';
 import PaymentModal from '@/components/auth/authRegistroHost/PaymentModal';
 import CompleteProfileModal from '@/components/auth/authRegistroHost/CompleteProfileModal';
+import { BASE_URL } from '@/libs/api';
 
 export default function MainHome() {
   const [activeModal, setActiveModal] = useState<'login' | 'register' | 'vehicleData' | 'paymentData' | 'completeProfile' | null>(null);
@@ -88,6 +89,10 @@ export default function MainHome() {
         <NavbarInicioSesion onBecomeHost={() => setActiveModal('vehicleData')} />
       </header>
 
+      <header className="/* headerFilters */">
+        <FiltersBar />
+      </header>
+
       <main className="flex-grow p-8">
         <div className="/* scrollContent */">
           <p>Contenido principal del usuario (tarjetas, información, etc.).</p>
@@ -127,7 +132,7 @@ export default function MainHome() {
             // Verificamos que id_vehiculo exista antes de usarlo
             if (vehicleData?.id_vehiculo) {
               const token = localStorage.getItem("token");
-              await fetch(`http://34.69.214.55:3001/api/vehiculos/eliminar-vehiculo/${vehicleData.id_vehiculo}`, {
+              await fetch(`${BASE_URL}/vehiculos/eliminar-vehiculo/${vehicleData.id_vehiculo}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${token}` },
               });

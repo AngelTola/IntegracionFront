@@ -2,6 +2,7 @@ import styles from "./RegisterModal.module.css";
 import { useState } from "react";
 import CompleteProfileModal from "./CompleteProfileModal"; // ajusta si cambia el path
 import { useEffect } from "react";
+import { BASE_URL } from '@/libs/api';
 /* import { useSearchParams } from "next/navigation"; */ // o useLocation si usas react-router
 /* import { backendip } from "@/libs/authServices"; */
 
@@ -19,7 +20,7 @@ export default function RegisterModal({
       localStorage.setItem("welcomeMessage", "¡Bienvenido a Redibo!");
       // Pequeño delay para que el spinner alcance a mostrarse
       setTimeout(() => {
-        window.location.href = "http://34.69.214.55:3001/api/auth/google";
+        window.location.href = `${BASE_URL}/auth/google`;
       }, 300); // 300ms = 0.3 segundos
     } catch (error) {
       console.error("Error en registro con Google", error);
@@ -312,7 +313,7 @@ export default function RegisterModal({
       // Si pasa validaciones de formato, ahora verificamos si ya está en uso en BD
       try {
         const phoneCheckResponse = await fetch(
-          "http://34.69.214.55:3001/api/check-phone",
+          `${BASE_URL}/check-phone`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -364,7 +365,7 @@ export default function RegisterModal({
         telefono: phone ? parseInt(cleanPhone) : null,
       };
 
-      const res = await fetch("http://34.69.214.55:3001/api/register", {
+      const res = await fetch(`${BASE_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(user),
@@ -666,9 +667,9 @@ export default function RegisterModal({
                   >
                     <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
                     <path
-                      fillRule="evenodd"
+                      fill-rule="evenodd"
                       d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
-                      clipRule="evenodd"
+                      clip-rule="evenodd"
                     />
                   </svg>
                 </div>
@@ -747,9 +748,9 @@ export default function RegisterModal({
                   >
                     <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
                     <path
-                      fillRule="evenodd"
+                      fill-rule="evenodd"
                       d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
-                      clipRule="evenodd"
+                      clip-rule="evenodd"
                     />
                   </svg>
                 </div>
@@ -769,9 +770,9 @@ export default function RegisterModal({
                   }`}
                 >
                   <path
-                    fillRule="evenodd"
+                    fill-rule="evenodd"
                     d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z"
-                    clipRule="evenodd"
+                    clip-rule="evenodd"
                   />
                 </svg>
 

@@ -3,6 +3,7 @@ import styles from "./RegisterModal.module.css";
 import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BASE_URL } from '@/libs/api';
 
 
 export default function CompleteProfileModal({
@@ -116,7 +117,7 @@ export default function CompleteProfileModal({
       return;
     } else {
       try {
-        const res = await fetch("http://34.69.214.55:3001/api/check-phone", {
+        const res = await fetch(`${BASE_URL}/check-phone`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ telefono: parseInt(cleanPhone) }),
@@ -142,7 +143,7 @@ export default function CompleteProfileModal({
     setError("");
 
     try {
-      const res = await fetch("http://34.69.214.55:3001/api/update-profile", {
+      const res = await fetch(`${BASE_URL}/update-profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -329,7 +330,7 @@ export default function CompleteProfileModal({
                try {
                 const email = localStorage.getItem("google_email");
                 if (email) {
-                  await fetch("http://34.69.214.55:3001/api/delete-incomplete-user", {
+                  await fetch(`${BASE_URL}/delete-incomplete-user`, {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email }),

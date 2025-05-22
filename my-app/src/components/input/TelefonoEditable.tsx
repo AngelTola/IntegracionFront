@@ -83,7 +83,7 @@ export default function TelefonoEditable({ initialValue, campoEnEdicion, setCamp
             const value = e.target.value;
             if (value.length <= 8) {
               setValorTemporal(value);
-              validarTelefono(value); // ✅ siempre validar mientras escribe
+              validarTelefono(value);
             }
           }}
           readOnly={!editando}
@@ -125,7 +125,7 @@ export default function TelefonoEditable({ initialValue, campoEnEdicion, setCamp
         <div className="flex gap-2 mt-2 justify-end">
           <button
             onClick={handleGuardar}
-            disabled={!!errorMensaje || valorTemporal.trim() === ''} // 👈 NUEVO: error o vacío
+            disabled={!!errorMensaje || valorTemporal.trim() === ''} 
             className={`px-4 py-1 rounded-lg transition cursor-pointer shadow-[var(--sombra)] ${
               !!errorMensaje || valorTemporal.trim() === ''
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'

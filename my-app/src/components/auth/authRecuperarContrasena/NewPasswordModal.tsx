@@ -2,17 +2,16 @@
 
 import { useState } from 'react';
 import Image from "next/image"
+import { BASE_URL } from '@/libs/api';
 
 const NewPasswordModal = ({
   code,
-  //onPasswordResetSuccess,
-  onClose, // Agregamos una función para cerrar el modal
+  onClose,
   onNewPasswordSubmit
 }: {
   code: string;
-  //onPasswordResetSuccess: () => void;
-  onClose: () => void; // Nueva prop para manejar el cierre del modal
-  onNewPasswordSubmit: (newPassword: string) => void; // Nueva prop para manejar el envío de la nueva contraseña
+  onClose: () => void;
+  onNewPasswordSubmit: (newPassword: string) => void;
 }) => {
   console.log('🧠 Código recibido en NewPasswordModal:', code);
   const [newPassword, setNewPassword] = useState('');
@@ -56,18 +55,12 @@ const NewPasswordModal = ({
       setError("No puede tener más de 25 caracteres");
       return false;
     }
-    setError(""); // Limpia el error si todo es válido
+    setError("");
     return true;
   };
 
   const handleConfirm = async () => {
     setError('');
-
-    
-    /*if (!code || code.length !== 6) {
-      setError('Código no válido. Intenta nuevamente.');
-      return;
-    }*/
 
     if (!newPassword || !confirmPassword) {
       setError('Por favor completa ambos campos.');
@@ -90,9 +83,8 @@ const NewPasswordModal = ({
 
     try {
       console.log('📤 Enviando al backend:', {newPassword });
-      //console.log('📦 Código recibido en NewPasswordModal:', code);
 
-      const response = await fetch('http://localhost:4000/api/reset-password', {
+      const response = await fetch(`${BASE_URL}/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({  newPassword }),

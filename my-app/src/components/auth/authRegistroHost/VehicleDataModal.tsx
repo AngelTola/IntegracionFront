@@ -305,5 +305,3 @@ const VehicleDataModal: React.FC<Props> = ({ onNext, onClose }) => {
 };
 
 export default VehicleDataModal;
-
-

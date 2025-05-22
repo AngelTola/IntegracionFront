@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { X, Check } from "lucide-react";
+import { BASE_URL } from '@/libs/api';
 
 interface Props {
   onComplete: () => void;
@@ -64,7 +65,7 @@ const CompleteProfileModal: React.FC<Props> = ({
         formData.append("detalles_metodo", paymentData.efectivoDetalle);
       }
 
-      const response = await fetch("http://34.69.214.55:3001/api/registro-host", {
+      const response = await fetch(`${BASE_URL}/registro-host`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef } from 'react';
+import { BASE_URL } from '@/libs/api';
 
 //foto de perfil
 //import { uploadProfilePhoto } from '@/libs/userService';
@@ -66,7 +67,7 @@ export default function FotoDePerfilEditable({setImagePreviewUrl }: Props) {
   
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://34.69.214.55:3001/api/upload-profile-photo', {
+        const response = await fetch(`${BASE_URL}/upload-profile-photo`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

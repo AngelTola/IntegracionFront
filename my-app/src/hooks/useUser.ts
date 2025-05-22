@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
+import { BASE_URL } from '@/libs/api';
 
 interface User {
-  id_usuario: number;
-  nombre_completo: string;
+  idUsuario: number;
+  nombreCompleto: string;
   email: string;
   telefono?: number;
-  fecha_nacimiento?: string;
-  foto_perfil?: string;
+  fechaNacimiento?: string;
+  fotoPerfil?: string;
 }
 
 export const useUser = () => {
@@ -18,7 +19,7 @@ export const useUser = () => {
       if (!token) return;
 
       try {
-        const res = await fetch('http://34.69.214.55:3001/api/me', {
+        const res = await fetch(`${BASE_URL}/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

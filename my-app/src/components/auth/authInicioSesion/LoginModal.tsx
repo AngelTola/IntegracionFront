@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { login } from '@/libs/authServices'; // Importa tu servicio
 import { useRouter } from 'next/navigation';
+import { BASE_URL } from "@/libs/api"
 ///////////////////////////
 export default function LoginModal({ onClose, onRegisterClick, onPasswordRecoveryClick}: { 
   onClose: () => void; 
@@ -38,6 +39,12 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
   const [showPassword, setShowPassword] = useState(false);
   
   const router = useRouter();
+
+  const handleGoogleLogin = () => {
+    // Redirigir al endpoint de autenticación de Google
+    console.log("Redirigiendo a Google Auth:", `${BASE_URL}/auth/google`)
+    window.location.href = `${BASE_URL}/auth/google`
+  }
 
   const handleLogin = async () => {
     setError('');
@@ -87,7 +94,6 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
       return;
     }
 
-
     
     const emailDomain = email.substring(email.indexOf('@'));
   
@@ -127,7 +133,6 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
   };
   /////////////////////////////////
 
-
   return (
     <div className="fixed inset-0 flex justify-center items-center z-[9999] bg-black/20">
       <div className="w-full h-full  
@@ -158,7 +163,9 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
           </span>
         </h1>
         <div className='flex justify-center mb-6 font-bold'>
-        <button className='w-64 flex py-2 shadow-[2px_2px_4px_rgba(0,0,0,0.4)] border-2 border-[var(--negro)] rounded-lg cursor-pointer 
+        <button 
+        onClick={handleGoogleLogin}
+        className='w-64 flex py-2 shadow-[2px_2px_4px_rgba(0,0,0,0.4)] border-2 border-[var(--negro)] rounded-lg cursor-pointer 
         transition-all duration-150
         active:scale-95 active:shadow-inner
         hover:shadow-md'>

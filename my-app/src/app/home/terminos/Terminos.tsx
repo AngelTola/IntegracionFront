@@ -38,8 +38,7 @@ export default function Terminos() {
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background-principal)]">
       <header>
-          <Navbar onLoginClick={() => setActiveModal('login')}
-          onRegisterClick={() => setActiveModal('register')}/>
+          <Navbar/>
       </header>
 
 

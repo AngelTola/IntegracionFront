@@ -2,9 +2,9 @@
 
 ////////////back///////////
 import { useState } from 'react';
-import { login } from '@/libs/authServices'; // Importa tu servicio
-import { useRouter } from 'next/navigation';
+import { login } from '@/libs/authServices';
 import { BASE_URL } from "@/libs/api"
+import axios, { AxiosError } from 'axios';
 ///////////////////////////
 export default function LoginModal({ onClose, onRegisterClick, onPasswordRecoveryClick}: { 
   onClose: () => void; 
@@ -37,8 +37,6 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
 
   //Efecto de boton de activar o desactivar poder ver la contraseña
   const [showPassword, setShowPassword] = useState(false);
-  
-  const router = useRouter();
 
   const handleGoogleLogin = () => {
     // Redirigir al endpoint de autenticación de Google
@@ -47,90 +45,89 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
   }
 
   const handleLogin = async () => {
+    // Limpiar errores previos
     setError('');
     setErrorPasswordLength('');
-    //añadi recien 
     setErrorBeforeAt('');
     setErrorTextAfterAt('');
-    setError('');
-    setErrorPasswordLength('');
     setErrorDomain('');
     setErrorAtSymbol('');
-    
-
-    
-    //Dominio
-    setErrorDomain('');
+    setHasLoginError(false);
+  
     const allowedDomains = [
-      '@gmail.com', 
-      '@outlook.com', 
-      '@hotmail.com', 
-      '@live.com', 
-      '@yahoo.com', 
-      '@icloud.com', 
+      '@gmail.com',
+      '@outlook.com',
+      '@hotmail.com',
+      '@live.com',
+      '@yahoo.com',
+      '@icloud.com',
       '@proton.me'
     ];
-
-    //validar el signo @
+  
     if (!email.includes('@')) {
       setErrorAtSymbol('Incluye un signo @ en el correo electrónico.');
       setHasLoginError(true);
       return;
     }
-
-    // Validar que contenga texto antes del @
+  
     const atIndex = email.indexOf('@');
     if (atIndex <= 0) {
       setErrorBeforeAt('Ingresa nombre de usuario antes del signo @');
       setHasLoginError(true);
       return;
     }
-    // Validar que contenga texto después del @
+  
     const textAfterAt = email.substring(atIndex + 1);
-
     if (textAfterAt.trim() === '') {
       setErrorTextAfterAt('Ingresa un dominio después del signo @');
       setHasLoginError(true);
       return;
     }
-
-    
-    const emailDomain = email.substring(email.indexOf('@'));
   
+    const emailDomain = email.substring(email.indexOf('@'));
     if (!allowedDomains.includes(emailDomain)) {
       setErrorDomain('Introduzca un dominio correcto.');
       setHasLoginError(true);
-      return; // ⚠️ No intentar loguear si el dominio es incorrecto
-  }
-  // Validar longitud
-  if (password.length < 8 || password.length > 25) {
-    setErrorPasswordLength('La cantidad mínima es de 8 caracteres y el máximo es de 25 caracteres.');
-    setHasLoginError(true);
-    return; // si no cumple longitud, NO INTENTAR loguear
-  }
-
+      return;
+    }
+  
+    if (password.length < 8 || password.length > 25) {
+      setErrorPasswordLength('La contraseña debe tener entre 8 y 25 caracteres.');
+      setHasLoginError(true);
+      return;
+    }
+  
     try {
       const result = await login(email, password);
       console.log('Login exitoso:', result);
-
-      //Guarda el token y el nombre del usuario
+  
       localStorage.setItem('token', result.token);
-      localStorage.setItem('nombre_completo', result.user.nombre_completo);
-
-
+      localStorage.setItem('nombre_completo', result.user.nombreCompleto);
+  
       setError('');
       setHasLoginError(false);
-      // Puedes hacer algo con el resultado aquí, como guardar el token o redirigir
-      router.push('/home/homePage');
-    }  catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      /*setError(error?.response?.data?.message || 'Error al iniciar sesión.');
-      setHasLoginError(true);*/
-      setError('Los datos no son validos.');
-      setHasLoginError(true);
-    }
+  
+      window.location.reload();
+    } catch (error: unknown) {
+  if (axios.isAxiosError(error)) {
+    const axiosError = error as AxiosError<{ message: string }>;
+    const backendMessage = axiosError.response?.data?.message;
 
+    if (backendMessage) {
+      setError(backendMessage);
+    } else {
+      setError('Error desconocido al iniciar sesión.');
+    }
+  } else if (error instanceof Error) {
+    setError(error.message);
+  } else {
+    setError('Se produjo un error inesperado.');
+  }
+
+  setHasLoginError(true);
+}
   };
+  
   /////////////////////////////////
 
   return (

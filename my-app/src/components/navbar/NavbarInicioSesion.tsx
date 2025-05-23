@@ -17,8 +17,8 @@ export default function NavbarInicioSesion({ onBecomeHost }: { onBecomeHost: () 
   const router = useRouter();
   
   useEffect(() => {
-    if (user?.foto_perfil) {
-      setProfilePhotoUrl(`http://34.69.214.55:3001${user.foto_perfil}`);
+    if (user?.fotoPerfil) {
+      setProfilePhotoUrl(`http://34.69.214.55:3001${user.fotoPerfil}`);
     } else {
       setProfilePhotoUrl(null); // Si no hay foto, se usa el icono por defecto
     }
@@ -66,7 +66,7 @@ export default function NavbarInicioSesion({ onBecomeHost }: { onBecomeHost: () 
             <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)} 
             className="flex-1 md:flex-none px-4 md:px-8 py-[0.4rem] font-[var(--tamaña-bold)] text-[var(--blanco)] text-sm md:text-base whitespace-nowrap">
-                {user?.nombre_completo || 'Nombre Usuario'}
+                {user?.nombre || 'Nombre Usuario'}
             </button>
             <div className="flex items-center justify-center px-3 md:px-4">
               {profilePhotoUrl ? (

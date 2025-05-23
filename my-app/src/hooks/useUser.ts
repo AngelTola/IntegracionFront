@@ -3,7 +3,8 @@ import { BASE_URL } from '@/libs/api';
 
 interface User {
   idUsuario: number;
-  nombreCompleto: string;
+  nombre: string;
+  apellido: string;
   email: string;
   telefono?: number;
   fechaNacimiento?: string;
@@ -25,7 +26,7 @@ export const useUser = () => {
           },
         });
         const data = await res.json();
-        console.log('✅ User cargado:', data.user); // <-- DEBUG: para verificar que viene la foto
+        console.log('✅ User cargado:', data.user);
         setUser(data.user);
       } catch (error) {
         console.error('Error al obtener el usuario:', error);

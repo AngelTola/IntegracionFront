@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 
 import Inputlabel from "@/components/input/Inputlabel";
-import NavbarPerfilUsuario from "@/components/navbar/NavbarPerfilUsuario";
 import Button from "@/components/botons/botons";
 import FotoDePerfilEditable from "@/components/input/FotoDePerfilEditable";
 import NombreEditable from "@/components/input/NombreEditable";
@@ -20,7 +19,7 @@ export default function UserPerfilPage() {
 
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
 
-  const [campoEnEdicion, setCampoEnEdicion] = useState<string | null>(null); // 👈 NUEVO
+  const [campoEnEdicion, setCampoEnEdicion] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.fotoPerfil) {
@@ -31,13 +30,11 @@ export default function UserPerfilPage() {
 
   return (
     <>
-      <NavbarPerfilUsuario />
-
       <div className="border-b border-gray-300"></div>
 
       <main className="min-h-screen bg-white text-gray-900 flex items-center justify-center px-4 sm:px-8 lg:px-12 py-8">
         <div className="flex flex-col md:flex-row w-full max-w-5xl items-start gap-10">
-          
+
           <div className="flex flex-col justify-center md:justify-start w-full md:w-1/3 items-center">
             <div className='border-2 rounded-3xl'>
               {imagePreviewUrl ? (
@@ -65,9 +62,9 @@ export default function UserPerfilPage() {
               {/* Input Nombre */}
               {user && (
                 <NombreEditable
-                  initialValue={user.nombreCompleto}
-                  campoEnEdicion={campoEnEdicion} 
-                  setCampoEnEdicion={setCampoEnEdicion} 
+                  initialValue={(user.nombre + " " + user.apellido)}
+                  campoEnEdicion={campoEnEdicion}
+                  setCampoEnEdicion={setCampoEnEdicion}
                 />
               )}
 

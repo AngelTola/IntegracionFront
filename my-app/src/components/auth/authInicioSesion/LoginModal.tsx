@@ -127,8 +127,6 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
   setHasLoginError(true);
 }
   };
-  
-  /////////////////////////////////
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-[9999] bg-black/20">

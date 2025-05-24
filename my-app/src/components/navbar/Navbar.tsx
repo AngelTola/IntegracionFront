@@ -19,30 +19,69 @@ export default function DynamicNavbar({ onBecomeHost }: DynamicNavbarProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userName, setUserName] = useState<string>('');
   
   const router = useRouter();
   const user = useUser();
 
-  // Verificar estado de autenticación
-  useEffect(() => {
+  const updateAuthState = () => {
     const token = localStorage.getItem('token');
+    const nombreCompleto = localStorage.getItem('nombre_completo');
+    const userPicture = localStorage.getItem('user_picture');
+    
     setIsLoggedIn(!!token);
-  }, []);
-
-  // Configurar foto de perfil
-  useEffect(() => {
-    if (user?.fotoPerfil) {
+    setUserName(nombreCompleto || '');
+    
+    if (userPicture) {
+      setProfilePhotoUrl(userPicture);
+    } else if (user?.fotoPerfil) {
       setProfilePhotoUrl(`http://34.69.214.55:3001${user.fotoPerfil}`);
     } else {
       setProfilePhotoUrl(null);
+    }
+  };
+
+  useEffect(() => {
+    updateAuthState();
+  }, []);
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      updateAuthState();
+    };
+
+    window.addEventListener('authChange', handleAuthChange);
+    
+    window.addEventListener('storage', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('authChange', handleAuthChange);
+      window.removeEventListener('storage', handleAuthChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (user?.fotoPerfil && !localStorage.getItem('user_picture')) {
+      setProfilePhotoUrl(`http://34.69.214.55:3001${user.fotoPerfil}`);
+    }
+    if (user?.nombre && !localStorage.getItem('nombre_completo')) {
+      setUserName(user.nombre);
     }
   }, [user]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('nombre_completo');
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_picture');
+    
     setIsLoggedIn(false);
+    setUserName('');
+    setProfilePhotoUrl(null);
     setIsMenuOpen(false);
+    
+    window.dispatchEvent(new Event('authChange'));
+    
     router.push('/');
   };
 
@@ -50,14 +89,13 @@ export default function DynamicNavbar({ onBecomeHost }: DynamicNavbarProps) {
     setActiveBtn(index);
     if (index === 0) {
       if (isLoggedIn) {
-        router.push('/home/homePage');
-      } else {
+        router.push('/home');
+      }else{
         router.push('/home');
       }
     } else if (index === 1) {
       router.push('/autos');
     }
-    // Agregar más navegaciones según necesites
   };
 
   return (
@@ -105,7 +143,7 @@ export default function DynamicNavbar({ onBecomeHost }: DynamicNavbarProps) {
                   onClick={() => setIsMenuOpen(!isMenuOpen)} 
                   className="flex-1 md:flex-none px-4 md:px-8 py-[0.4rem] font-[var(--tamaña-bold)] text-[var(--blanco)] text-sm md:text-base whitespace-nowrap"
                 >
-                  {user?.nombre || localStorage.getItem('nombre_completo') || 'Usuario'}
+                  {userName || user?.nombre || 'Usuario'}
                 </button>
                 <div className="flex items-center justify-center px-3 md:px-4">
                   {profilePhotoUrl ? (
@@ -125,7 +163,7 @@ export default function DynamicNavbar({ onBecomeHost }: DynamicNavbarProps) {
                     >
                       <path
                         fillRule="evenodd"
-                        d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+                        d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
                         clipRule="evenodd"
                       />
                     </svg>

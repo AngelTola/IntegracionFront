@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { BASE_URL } from '@/libs/api';
 
 interface User {
   idUsuario: number;
@@ -9,6 +8,12 @@ interface User {
   telefono?: number;
   fechaNacimiento?: string;
   fotoPerfil?: string;
+  edicionesNombre: number; // 👈 AÑADIR ESTO
+  edicionesTelefono: number;
+  edicionesFecha: number;
+
+  driverBool: boolean;
+  host: boolean
 }
 
 export const useUser = () => {

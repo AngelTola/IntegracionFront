@@ -99,6 +99,7 @@ export default function UserPerfilPage() {
                     initialValue={user.telefono?.toString() || ''}
                     campoEnEdicion={campoEnEdicion} // 👈 NUEVO
                     setCampoEnEdicion={setCampoEnEdicion} // 👈 NUEVO
+                    edicionesUsadas={user.edicionesTelefono || 0}
                   />
                 )}
               </div>

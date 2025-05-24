@@ -1,6 +1,10 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+<<<<<<< HEAD
 //import NavbarInicioSesion from '@/components/navbar/NavbarInicioSesion';
+=======
+import NavbarInicioSesion from '@/app/components/navbar/NavbarInicioSesion';
+>>>>>>> 1677a42da72c4afd103920ac52a6c40a4ebc9548
 
 
 export default function TerminosLogin() {
@@ -34,6 +38,17 @@ export default function TerminosLogin() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background-principal)]">
+<<<<<<< HEAD
+=======
+      <header>
+          <NavbarInicioSesion onBecomeHost={function (): void {
+          throw new Error('Function not implemented.');
+        } } onBecomeDriver={function (): void {
+          throw new Error('Function not implemented.');
+        } }/>
+      </header>
+
+>>>>>>> 1677a42da72c4afd103920ac52a6c40a4ebc9548
 
       <main className="flex-1 bg-[var(--blanco)] pt-[1.7rem] px-4 md:px-12">
         <div className="flex flex-col md:flex-row items-start gap-8 max-w-[1200px] mx-auto">

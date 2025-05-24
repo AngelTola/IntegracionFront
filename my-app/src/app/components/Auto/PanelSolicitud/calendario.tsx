@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar } from "@/components/Auto/ui/calendar";
+import { Calendar } from "@/app/components/Auto/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { es } from "date-fns/locale"; 
 

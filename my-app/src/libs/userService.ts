@@ -1,7 +1,5 @@
 // libs/userService.ts
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api"
-
+import { BASE_URL } from "@/libs/autoServices";
 export const updateUserField = async (campo: string, valor: string) => {
     const token = localStorage.getItem("token");
   
@@ -57,7 +55,7 @@ export const updateUserField = async (campo: string, valor: string) => {
       throw new Error(errorData.message || 'Error al eliminar la foto');
     }
   
-    return res.json();
+    return res.json(); // { message }
   };
 
   

@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react';
 
 interface User {
   idUsuario: number;
-  nombre: string;
-  apellido: string;
+  nombreCompleto: string;
   email: string;
-  telefono?: number;
+  telefono?: string;
   fechaNacimiento?: string;
   fotoPerfil?: string;
   edicionesNombre: number; // 👈 AÑADIR ESTO
@@ -25,13 +24,13 @@ export const useUser = () => {
       if (!token) return;
 
       try {
-        const res = await fetch(`${BASE_URL}/me`, {
+        const res = await fetch('http://localhost:3001/api/me', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         const data = await res.json();
-        console.log('✅ User cargado:', data.user);
+        console.log('✅ User cargado:', data.user); // <-- DEBUG: para verificar que viene la foto
         setUser(data.user);
       } catch (error) {
         console.error('Error al obtener el usuario:', error);

@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-
-=======
 /*import Image from "next/image";
 
 export default function Home() {
@@ -106,7 +103,6 @@ export default function Home() {
 }
 */
 // src/app/page.tsx
->>>>>>> 1677a42da72c4afd103920ac52a6c40a4ebc9548
 import { redirect } from 'next/navigation';
 
 export default function RedirectToHome() {

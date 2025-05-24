@@ -1,14 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getAutosDisponiblesPorFecha } from "@/libs/api"
+import { getAutosDisponiblesPorFecha } from "@/libs/autoServices"
 import type { Auto } from "@/types/auto"
 import Image from "next/image"
-import BarraBusqueda from "@/components/Auto/BusquedaAuto/BarraBusqueda"
+import BarraBusqueda from "@/app/components/Auto/BusquedaAuto/BarraBusqueda"
 import Link from "next/link"
-import Estrellas from "@/components/Auto/Estrellas"
-import OrdenadoPor from "@/components/Auto/Ordenamiento/OrdenadoPor"
-import BarraReserva from "@/components/listaAutos/barraReserva"
+import Estrellas from "@/app/components/Auto/Estrellas"
+import OrdenadoPor from "@/app/components/Auto/Ordenamiento/OrdenadoPor"
+import BarraReserva from "@/app/components/listaAutos/barraReserva"
 
 interface OptimizedImageProps {
   src: string;

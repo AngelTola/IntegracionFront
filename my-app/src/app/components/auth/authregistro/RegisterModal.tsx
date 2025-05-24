@@ -2,6 +2,7 @@ import styles from "./RegisterModal.module.css";
 import { useState } from "react";
 import CompleteProfileModal from "./CompleteProfileModal"; // ajusta si cambia el path
 import { useEffect } from "react";
+import { BASE_URL } from '@/libs/autoServices';
 /* import { useSearchParams } from "next/navigation"; */ // o useLocation si usas react-router
 /* import { backendip } from "@/libs/authServices"; */
 
@@ -13,18 +14,7 @@ export default function RegisterModal({
   onLoginClick: () => void;
 }) {
   const handleGoogleRegister = () => {
-    try {
-      setLoading(true);
-      localStorage.setItem("openCompleteProfileModal", "true");
-      localStorage.setItem("welcomeMessage", "¡Bienvenido a Redibo!");
-      // Pequeño delay para que el spinner alcance a mostrarse
-      setTimeout(() => {
-        window.location.href = "http://localhost:3001/api/auth/google";
-      }, 300); // 300ms = 0.3 segundos
-    } catch (error) {
-      console.error("Error en registro con Google", error);
-      setLoading(false);
-    }
+    window.location.href = `${BASE_URL}/auth/google`
   };
 
   /* Parte de las const*/
@@ -63,7 +53,6 @@ export default function RegisterModal({
   const [confirmPasswordMessage, setConfirmPasswordMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  /* const [password, setPassword] = useState(""); */
   const [birthError, setBirthError] = useState(false);
   const [birthMessage, setBirthMessage] = useState("");
   const [phoneError, setPhoneError] = useState(false);
@@ -166,20 +155,20 @@ export default function RegisterModal({
     let hasErrors = false;
 
     //validaciones de nombre de usuario
-    const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+    const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ'’\- ]+$/;
 
-    if (nameValue.trim().length < 3) {
+    if (name.length < 3) {
       setNameError(true);
       setNameMessage("El nombre debe tener al menos 3 caracteres");
       hasErrors = true;
-    } else if (nameValue.trim().length > 50) {
+    } else if (name.length > 50) {
       setNameError(true);
       setNameMessage("El nombre no puede superar los 50 caracteres");
       hasErrors = true;
-    } else if (!nameRegex.test(nameValue.trim())) {
+    } else if (!nameRegex.test(name)) {
       setNameError(true);
       setNameMessage(
-        "El nombre solo puede contener letras, tildes y espacios. No se permiten números."
+        "El nombre solo puede contener letras, tildes, espacios, guiones y apóstrofes"
       );
       hasErrors = true;
     } else {
@@ -312,11 +301,11 @@ export default function RegisterModal({
       // Si pasa validaciones de formato, ahora verificamos si ya está en uso en BD
       try {
         const phoneCheckResponse = await fetch(
-          "http://localhost:3001/api/check-phone",
+          `${BASE_URL}/check-phone`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ telefono: parseInt(cleanPhone) }),
+            body: JSON.stringify({ telefono: cleanPhone }),
           }
         );
 
@@ -346,7 +335,7 @@ export default function RegisterModal({
       setTermsError(false);
     }
 
-    if (hasErrors) return; // Si hay al menos un error, no continúa
+    if (hasErrors) return;
 
     /*conexion con back end*/
     try {
@@ -357,14 +346,14 @@ export default function RegisterModal({
       ).toISOString();
 
       const user = {
-        nombre_completo: name,
+        nombreCompleto: nameValue.trim(),
         email,
         contraseña: password,
-        fecha_nacimiento: fechaNacimiento,
-        telefono: phone ? parseInt(cleanPhone) : null,
+        fechaNacimiento: fechaNacimiento,
+        telefono: phone ? cleanPhone : null,
       };
 
-      const res = await fetch("http://localhost:3001/api/register", {
+      const res = await fetch(`${BASE_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(user),
@@ -414,9 +403,8 @@ export default function RegisterModal({
           <div className={styles.modal}>
             {showWelcome && (
               <div
-                className={`${styles.welcomeMessage} ${
-                  !showWelcome ? styles.fadeOut : ""
-                }`}
+                className={`${styles.welcomeMessage} ${!showWelcome ? styles.fadeOut : ""
+                  }`}
               >
                 {welcome}
               </div>
@@ -478,17 +466,15 @@ export default function RegisterModal({
             <form onSubmit={handleSubmit} className={styles.form}>
               {/* campo nombre */}
               <div
-                className={`${styles.halfInput} ${
-                  nameError ? styles.errorInput : ""
-                }`}
+                className={`${styles.halfInput} ${nameError ? styles.errorInput : ""
+                  }`}
               >
                 <svg
                   fill="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`${styles.uIcon} ${
-                    nameError ? styles.errorIcon : ""
-                  }`}
+                  className={`${styles.uIcon} ${nameError ? styles.errorIcon : ""
+                    }`}
                 >
                   <path
                     fillRule="evenodd"
@@ -500,9 +486,9 @@ export default function RegisterModal({
                 <div className={styles.halfInput2}>
                   <label
                     htmlFor="name"
-                    style={{ color: getLabelColor(nameError) }}
+                    style={{ color: getLabelColor(passwordError) }}
                   >
-                    Nombre completo
+                    {nameError ? "Nombre" : "Nombre"}
                   </label>
 
                   <input
@@ -510,38 +496,19 @@ export default function RegisterModal({
                     id="name"
                     name="name"
                     value={nameValue}
+                    onChange={(e) => {
+                      setNameValue(e.target.value);
+                      localStorage.setItem("register_name", e.target.value);
+                    }}
                     maxLength={50}
                     placeholder={
                       nameError
                         ? "El campo no puede estar vacío"
-                        : "Nombre completo"
+                        : "Nombre"
                     }
-                    className={`${styles.input} ${
-                      nameError ? styles.errorInput : ""
-                    }`}
-                    onChange={(e) => {
-                      const input = e.target.value;
-                      const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]*$/;
-
-                      if (regex.test(input) || input === "") {
-                        setNameValue(input);
-                        localStorage.setItem("register_name", input);
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (/\d/.test(e.key)) {
-                        e.preventDefault(); // Bloquea ingreso de números
-                      }
-                    }}
-                    onPaste={(e) => {
-                      const paste = e.clipboardData.getData("text");
-                      if (/\d/.test(paste)) {
-                        e.preventDefault(); // Bloquea pegado de números
-                      }
-                    }}
-                    required
+                    className={`${styles.input} ${nameError ? styles.errorInput : ""
+                      }`}
                   />
-
                   {nameError && nameMessage && (
                     <p
                       style={{
@@ -558,17 +525,15 @@ export default function RegisterModal({
 
               {/*campo email correo electronico*/}
               <div
-                className={`${styles.halfInput} ${
-                  emailError ? styles.errorInput : ""
-                }`}
+                className={`${styles.halfInput} ${emailError ? styles.errorInput : ""
+                  }`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className={`${styles.eicon} ${
-                    emailError ? styles.errorIcon : ""
-                  }`}
+                  className={`${styles.eicon} ${emailError ? styles.errorIcon : ""
+                    }`}
                 >
                   <path d="M1.5 8.67v8.58a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3V8.67l-8.928 5.493a3 3 0 0 1-3.144 0L1.5 8.67Z" />
                   <path d="M22.5 6.908V6.75a3 3 0 0 0-3-3h-15a3 3 0 0 0-3 3v.158l9.714 5.978a1.5 1.5 0 0 0 1.572 0L22.5 6.908Z" />
@@ -594,9 +559,8 @@ export default function RegisterModal({
                     placeholder={
                       emailError ? "Correo inválido" : "Correo electrónico"
                     }
-                    className={`${styles.input} ${
-                      emailError ? styles.errorInput : ""
-                    }`}
+                    className={`${styles.input} ${emailError ? styles.errorInput : ""
+                      }`}
                   />
 
                   {emailError && emailMessage && (
@@ -616,9 +580,8 @@ export default function RegisterModal({
               {/* campo password */}
               <div className={styles.passwordRow}>
                 <div
-                  className={`${styles.halfInputC1} ${
-                    passwordError ? styles.errorInput : ""
-                  }`}
+                  className={`${styles.halfInputC1} ${passwordError ? styles.errorInput : ""
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -626,9 +589,8 @@ export default function RegisterModal({
                     height="24"
                     viewBox="0 0 24 24"
                     fill="currentColor"
-                    className={`${styles.iconollave} ${
-                      passwordError ? styles.errorIcon : ""
-                    }`}
+                    className={`${styles.iconollave} ${passwordError ? styles.errorIcon : ""
+                      }`}
                   >
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M14.52 2c1.029 0 2.015 .409 2.742 1.136l3.602 3.602a3.877 3.877 0 0 1 0 5.483l-2.643 2.643a3.88 3.88 0 0 1 -4.941 .452l-.105 -.078l-5.882 5.883a3 3 0 0 1 -1.68 .843l-.22 .027l-.221 .009h-1.172c-1.014 0 -1.867 -.759 -1.991 -1.823l-.009 -.177v-1.172c0 -.704 .248 -1.386 .73 -1.96l.149 -.161l.414 -.414a1 1 0 0 1 .707 -.293h1v-1a1 1 0 0 1 .883 -.993l.117 -.007h1v-1a1 1 0 0 1 .206 -.608l.087 -.1l1.468 -1.469l-.076 -.103a3.9 3.9 0 0 1 -.678 -1.963l-.007 -.236c0 -1.029 .409 -2.015 1.136 -2.742l2.643 -2.643a3.88 3.88 0 0 1 2.741 -1.136m.495 5h-.02a2 2 0 1 0 0 4h.02a2 2 0 1 0 0 -4" />
@@ -655,9 +617,8 @@ export default function RegisterModal({
                       placeholder={
                         passwordError ? "contraseña inválida" : "Contraseña"
                       }
-                      className={`${styles.input2} ${
-                        passwordError ? styles.errorInput : ""
-                      }`}
+                      className={`${styles.input2} ${passwordError ? styles.errorInput : ""
+                        }`}
                     />
                     {passwordError && (
                       <p
@@ -678,9 +639,8 @@ export default function RegisterModal({
                     viewBox="0 0 24 24"
                     fill="currentColor"
                     style={{ cursor: "pointer" }}
-                    className={`${styles.ojito} ${
-                      passwordError ? styles.errorIcon : ""
-                    }`}
+                    className={`${styles.ojito} ${passwordError ? styles.errorIcon : ""
+                      }`}
                   >
                     <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
                     <path
@@ -693,9 +653,8 @@ export default function RegisterModal({
 
                 {/* campo confirmar contraseña */}
                 <div
-                  className={`${styles.halfInputC2} ${
-                    confirmPasswordError ? styles.errorInput : ""
-                  }`}
+                  className={`${styles.halfInputC2} ${confirmPasswordError ? styles.errorInput : ""
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -703,9 +662,8 @@ export default function RegisterModal({
                     height="24"
                     viewBox="0 0 24 24"
                     fill="currentColor"
-                    className={`${styles.iconollave} ${
-                      confirmPasswordError ? styles.errorIcon : ""
-                    }`}
+                    className={`${styles.iconollave} ${confirmPasswordError ? styles.errorIcon : ""
+                      }`}
                   >
                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                     <path d="M14.52 2c1.029 0 2.015 .409 2.742 1.136l3.602 3.602a3.877 3.877 0 0 1 0 5.483l-2.643 2.643a3.88 3.88 0 0 1 -4.941 .452l-.105 -.078l-5.882 5.883a3 3 0 0 1 -1.68 .843l-.22 .027l-.221 .009h-1.172c-1.014 0 -1.867 -.759 -1.991 -1.823l-.009 -.177v-1.172c0 -.704 .248 -1.386 .73 -1.96l.149 -.161l.414 -.414a1 1 0 0 1 .707 -.293h1v-1a1 1 0 0 1 .883 -.993l.117 -.007h1v-1a1 1 0 0 1 .206 -.608l.087 -.1l1.468 -1.469l-.076 -.103a3.9 3.9 0 0 1 -.678 -1.963l-.007 -.236c0 -1.029 .409 -2.015 1.136 -2.742l2.643 -2.643a3.88 3.88 0 0 1 2.741 -1.136m.495 5h-.02a2 2 0 1 0 0 4h.02a2 2 0 1 0 0 -4" />
@@ -736,9 +694,8 @@ export default function RegisterModal({
                           ? "contraseña invalida"
                           : "Confirme su contraseña"
                       }
-                      className={`${styles.input2} ${
-                        confirmPasswordError ? styles.errorInput : ""
-                      }`}
+                      className={`${styles.input2} ${confirmPasswordError ? styles.errorInput : ""
+                        }`}
                     />
                     {confirmPasswordError && (
                       <p
@@ -759,9 +716,8 @@ export default function RegisterModal({
                     viewBox="0 0 24 24"
                     fill="currentColor"
                     style={{ cursor: "pointer" }}
-                    className={`${styles.ojito} ${
-                      confirmPasswordError ? styles.errorIcon : ""
-                    }`}
+                    className={`${styles.ojito} ${confirmPasswordError ? styles.errorIcon : ""
+                      }`}
                   >
                     <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
                     <path
@@ -774,17 +730,15 @@ export default function RegisterModal({
               </div>
 
               <div
-                className={`${styles.halfInput} ${
-                  birthError ? styles.errorInput : ""
-                }`}
+                className={`${styles.halfInput} ${birthError ? styles.errorInput : ""
+                  }`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className={`${styles.cIcon} ${
-                    birthError ? styles.errorIcon : ""
-                  }`}
+                  className={`${styles.cIcon} ${birthError ? styles.errorIcon : ""
+                    }`}
                 >
                   <path
                     fillRule="evenodd"
@@ -802,9 +756,8 @@ export default function RegisterModal({
                   <div className={styles.birthInputs}>
                     <select
                       name="birthDay"
-                      className={`${styles.select} ${
-                        birthError ? styles.errorInput : ""
-                      }`}
+                      className={`${styles.select} ${birthError ? styles.errorInput : ""
+                        }`}
                     >
                       <option value="">DD</option>
                       {[...Array(31)].map((_, i) => (
@@ -815,9 +768,8 @@ export default function RegisterModal({
                     </select>
                     <select
                       name="birthMonth"
-                      className={`${styles.select} ${
-                        birthError ? styles.errorInput : ""
-                      }`}
+                      className={`${styles.select} ${birthError ? styles.errorInput : ""
+                        }`}
                     >
                       <option value="">MM</option>
                       {[...Array(12)].map((_, i) => (
@@ -828,9 +780,8 @@ export default function RegisterModal({
                     </select>
                     <select
                       name="birthYear"
-                      className={`${styles.select} ${
-                        birthError ? styles.errorInput : ""
-                      }`}
+                      className={`${styles.select} ${birthError ? styles.errorInput : ""
+                        }`}
                     >
                       <option value="">AAAA</option>
                       {[...Array(100)].map((_, i) => {
@@ -859,17 +810,15 @@ export default function RegisterModal({
 
               {/* campo teléfono */}
               <div
-                className={`${styles.halfInput} ${
-                  phoneError ? styles.errorInput : ""
-                }`}
+                className={`${styles.halfInput} ${phoneError ? styles.errorInput : ""
+                  }`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  className={`${styles.tIcon} ${
-                    phoneError ? styles.errorIcon : ""
-                  }`}
+                  className={`${styles.tIcon} ${phoneError ? styles.errorIcon : ""
+                    }`}
                 >
                   <path
                     fillRule="evenodd"
@@ -908,9 +857,8 @@ export default function RegisterModal({
                         ? "Número inválido"
                         : "Ingrese número de teléfono"
                     }
-                    className={`${styles.input3} ${
-                      phoneError ? styles.errorInput : ""
-                    }`}
+                    className={`${styles.input3} ${phoneError ? styles.errorInput : ""
+                      }`}
                   />
                 </div>
 
@@ -1005,7 +953,7 @@ export default function RegisterModal({
               onClick={() => {
                 setShowSuccessModal(false);
                 onClose(); // Cierra el modal de registro
-                setTimeout(() => (window.location.href = "/"), 100);
+                setTimeout(() => onLoginClick(), 100); // Abre login (opcional)
                 /* onClose(); */
               }}
               className={styles.successButton}

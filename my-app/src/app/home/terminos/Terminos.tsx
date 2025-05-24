@@ -1,14 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-<<<<<<< HEAD
-import Navbar from '@/components/navbar/Navbar';
-import LoginModal from '@/components/auth/authInicioSesion/LoginModal';
-import RegisterModal from '@/components/auth/authregistro/RegisterModal';
-=======
 import Navbar from '@/app/components/navbar/Navbar';
 import LoginModal from '@/app/components/auth/authInicioSesion/LoginModal';
 import RegisterModal from '@/app/components/auth/authregistro/RegisterModal';
->>>>>>> 1677a42da72c4afd103920ac52a6c40a4ebc9548
 
 
 export default function Terminos() {
@@ -44,12 +38,8 @@ export default function Terminos() {
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background-principal)]">
       <header>
-<<<<<<< HEAD
-          <Navbar/>
-=======
           <Navbar onLoginClick={() => setActiveModal('login')}
           onRegisterClick={() => setActiveModal('register')}/>
->>>>>>> 1677a42da72c4afd103920ac52a6c40a4ebc9548
       </header>
 
 

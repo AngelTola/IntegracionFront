@@ -50,7 +50,7 @@ export default function InfoHost({ usuario, marca, modelo }: Props) {
       </div>
 
       <p className="text-center text-[#333] text-lg mb-2">
-        {usuario?.nombre} {usuario?.apellido}
+        {usuario?.nombreCompleto}
       </p>
 
       {usuario?.telefono && (

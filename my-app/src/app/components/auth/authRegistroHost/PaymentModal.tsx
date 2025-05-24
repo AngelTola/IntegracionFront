@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { X, CreditCard, QrCode, DollarSign } from "lucide-react";
+import Image from "next/image"
 
 interface Props {
   onClose: () => Promise<void>;
@@ -29,8 +30,6 @@ export default function PaymentRegistrationModal({ onClose, onNext }: Props) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  const currentYear = new Date().getFullYear();
 
   // Validación en tiempo real para cada campo cuando cambia
   useEffect(() => {
@@ -475,7 +474,7 @@ export default function PaymentRegistrationModal({ onClose, onNext }: Props) {
                 >
                   {previewImg ? (
                     <>
-                      <img src={previewImg} alt="QR" className="w-full h-full object-contain rounded" />
+                      <Image src={previewImg} alt="QR" className="w-full h-full object-contain rounded" />
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

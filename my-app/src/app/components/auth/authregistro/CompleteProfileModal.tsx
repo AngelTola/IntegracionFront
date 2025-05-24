@@ -1,4 +1,5 @@
 /* import { backendip } from "@/libs/authServices"; */
+import { BASE_URL } from "@/libs/autoServices";
 import styles from "./RegisterModal.module.css";
 import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
@@ -149,7 +150,7 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
       return;
     } else {
       try {
-        const res = await fetch("http://localhost:3001/api/check-phone", {
+        const res = await fetch(`${BASE_URL}/check-phone`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ telefono: parseInt(cleanPhone) }),
@@ -175,7 +176,7 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3001/api/update-profile", {
+      const res = await fetch(`${BASE_URL}/update-profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -449,7 +450,7 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
               const email = localStorage.getItem("google_email");
               if (email) {
                 await fetch(
-                  "http://localhost:3001/api/delete-incomplete-user",
+                  `${BASE_URL}/delete-incomplete-user`,
                   {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" },

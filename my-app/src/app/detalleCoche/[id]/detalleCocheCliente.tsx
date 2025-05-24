@@ -1,13 +1,13 @@
 'use client';
 
-import Navbar from '@/components/navbar/NavbarDetalle';
-import GaleriaImagenes from '@/components/Auto/GaleriaImagenes';
-import Caracteristicas from '@/components/Auto/Caracteristicas';
-import InfoHost from '@/components/Auto/InfoHost';
-import Precio from '@/components/Auto/Precio';
-import PanelComentarios from '@/components/Auto/PanelComentarios';
-import SolicitudReserva from '@/components/Auto/PanelSolicitud/solicitudReserva';
-import Estrellas from '@/components/Auto/Estrellas';
+import Navbar from '@/app/components/navbar/Navbar';
+import GaleriaImagenes from '@/app/components/Auto/GaleriaImagenes';
+import Caracteristicas from '@/app/components/Auto/Caracteristicas';
+import InfoHost from '@/app/components/Auto/InfoHost';
+import Precio from '@/app/components/Auto/Precio';
+import PanelComentarios from '@/app/components/Auto/PanelComentarios';
+import SolicitudReserva from '@/app/components/Auto/PanelSolicitud/solicitudReserva';
+import Estrellas from '@/app/components/Auto/Estrellas';
 import { useEffect, useState } from 'react';
 import { Auto, Comentario } from '@/types/auto';
 
@@ -22,7 +22,7 @@ export default function DetalleCocheCliente({ auto }: Props) {
 
 
   useEffect(() => {
-    import('@/libs/api').then(({ getComentariosDeAuto }) => {
+    import('@/libs/autoServices').then(({ getComentariosDeAuto }) => {
       getComentariosDeAuto(auto.idAuto)
         .then((data) => setComentarios(data.data))
         .catch((err) => {
@@ -38,6 +38,7 @@ export default function DetalleCocheCliente({ auto }: Props) {
     : 0;
   return (
     <>
+      <Navbar />
 
       <SolicitudReserva
         mostrar={mostrarSolicitudResercva}

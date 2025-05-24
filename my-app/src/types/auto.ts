@@ -16,8 +16,7 @@ export type TipoDeNotificacion = 'RESERVA_SOLICITADA' | 'RESERVA_APROBADA' | 'RE
 // Interfaces principales
 export interface Usuario {
   idUsuario: number;
-  nombre: string;
-  apellido: string;
+  nombreCompleto: string;
   email: string;
   telefono?: string | null;
   direccion?: string | null;
@@ -194,6 +193,6 @@ export interface CalificacionUsuario {
 }
 
 // Tipos utilitarios para relaciones parciales
-export type UsuarioPreview = Pick<Usuario, 'idUsuario' | 'nombre' | 'apellido' | 'email'>;
+export type UsuarioPreview = Pick<Usuario, 'idUsuario' | 'nombreCompleto' | 'email'>;
 export type AutoPreview = Pick<Auto, 'idAuto' | 'marca' | 'modelo' | 'precioRentaDiario' | 'imagenes'>;
 export type ReservaPreview = Pick<Reserva, 'idReserva' | 'fechaInicio' | 'fechaFin' | 'estado'>;

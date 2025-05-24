@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import Image from "next/image"
+import { BASE_URL } from '@/libs/autoServices';
 
 const NewPasswordModal = ({
   code,
@@ -91,7 +93,7 @@ const NewPasswordModal = ({
       console.log('📤 Enviando al backend:', {newPassword });
       //console.log('📦 Código recibido en NewPasswordModal:', code);
 
-      const response = await fetch('http://localhost:3001/api/reset-password', {
+      const response = await fetch(`${BASE_URL}/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({  newPassword }),
@@ -176,7 +178,7 @@ const NewPasswordModal = ({
             onClick={() => setShowPassword(!showPassword)}  // Cambia el estado de visibilidad
             disabled={!setNewPassword}
           >
-            <img 
+            <Image 
               src="https://www.svgrepo.com/download/526542/eye.svg"
               alt="Mostrar contraseña"
               className="w-6 h-6"
@@ -212,7 +214,7 @@ const NewPasswordModal = ({
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             disabled={!confirmPassword}
           >
-            <img
+            <Image
               src="https://www.svgrepo.com/download/526542/eye.svg"
               alt="Mostrar contraseña"
               className="w-6 h-6"

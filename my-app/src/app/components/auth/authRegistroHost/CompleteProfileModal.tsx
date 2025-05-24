@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { X, Check } from "lucide-react";
+import { BASE_URL } from "@/libs/autoServices";
 
 interface Props {
   onComplete: () => void;
@@ -92,7 +93,7 @@ const CompleteProfileModal: React.FC<Props> = ({
         })
       });
 
-      const response = await fetch("http://localhost:3001/api/registro-host", {
+      const response = await fetch(`${BASE_URL}/registro-host`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
 import { useSearchParams } from "next/navigation";
-
-import NavbarInicioSesion from '@/app/components/navbar/NavbarInicioSesion';
 import FiltersBar from '@/app/components/filters/FiltersBar';
 import Footer from '@/app/components/footer/FooterLogin';
 import LoginModal from '@/app/components/auth/authInicioSesion/LoginModal';
@@ -110,11 +108,6 @@ export default function MainHome() {
   
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background-principal)]">
-      <header className="border-t border-b border-[rgba(215, 30, 30, 0.1)] shadow-[0_2px_6px_rgba(0,0,0,0.1)]">
-        <NavbarInicioSesion onBecomeHost={() => setActiveModal('vehicleData')} onBecomeDriver={function (): void {
-          throw new Error('Function not implemented.');
-        } } />
-      </header>
 
       <header className="/* headerFilters */">
         <FiltersBar />

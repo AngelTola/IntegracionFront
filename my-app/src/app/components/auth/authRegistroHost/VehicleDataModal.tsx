@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { X, Upload } from "lucide-react";
+import Image from "next/image"
 
 interface Props {
   onNext: (data: {
@@ -228,7 +229,7 @@ const VehicleDataModal: React.FC<Props> = ({ onNext, onClose }) => {
         {/* Campo Placa */}
         <div className="mb-4">
           <div className="relative flex items-center">
-            <img src="/placa.svg" alt="icono placa" className="absolute left-3 w-6 h-6" />
+            <Image src="/placa.svg" alt="icono placa" className="absolute left-3 w-6 h-6" />
             <input
               type="text"
               placeholder="Placa (ej. 1234ABC)"
@@ -251,7 +252,7 @@ const VehicleDataModal: React.FC<Props> = ({ onNext, onClose }) => {
         {/* Campo SOAT */}
         <div className="mb-4">
           <div className="relative flex items-center">
-            <img src="/seguro.svg" alt="icono seguro" className="absolute left-3 w-6 h-6" />
+            <Image src="/seguro.svg" alt="icono seguro" className="absolute left-3 w-6 h-6" />
             <input
               type="text"
               inputMode="numeric" 
@@ -314,7 +315,7 @@ const VehicleDataModal: React.FC<Props> = ({ onNext, onClose }) => {
                 const src = URL.createObjectURL(img);
                 return (
                   <div key={`${idx}-${img.name}`} className="relative w-20 h-20">
-                    <img
+                    <Image
                       src={src}
                       alt={`imagen-${idx}`}
                       onClick={() => setPreviewImg(src)}
@@ -359,7 +360,7 @@ const VehicleDataModal: React.FC<Props> = ({ onNext, onClose }) => {
           onClick={() => setPreviewImg(null)}
         >
           <div className="relative max-w-3xl w-full mx-4">
-            <img
+            <Image
               src={previewImg}
               alt="Previsualización"
               className="w-full h-auto rounded-xl shadow-xl"

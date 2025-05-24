@@ -1,6 +1,5 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
-import NavbarPerfilUsuario from '@/app/components/navbar/NavbarPerfilUsuario';
 import { X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import User from '@/app/components/Icons/User';
@@ -10,13 +9,12 @@ import Categoria from '@/app/components/Icons/Categoria';
 import Calendar from '@/app/components/Icons/Calendar';
 import Sexo from '@/app/components/Icons/Sexo';
 import { useUser } from '@/hooks/useUser';
-
-
+import Image from "next/image"
 
 const uploadImageToCloudinary = async (file: File): Promise<string | null> => {
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("upload_preset", "redibo_driver"); 
+  formData.append("upload_preset", "redibo_driver");
 
   try {
     const response = await fetch("https://api.cloudinary.com/v1_1/do94h9rbw/image/upload", {
@@ -32,8 +30,7 @@ const uploadImageToCloudinary = async (file: File): Promise<string | null> => {
   }
 };
 
-
-export default function registroDriver() {
+export default function RegistroDriver() {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [anverso, setAnverso] = useState<File | null>(null);
@@ -45,8 +42,8 @@ export default function registroDriver() {
   const [telefonoUsuario, setTelefonoUsuario] = useState<string>('');
   const [NroLicencia, setNroLicencia] = useState<string>('');
   const [categoriaLicencia, setCategoriaLicencia] = useState<string>('');
-  const [fechaVencimiento, setFechaVencimientoState] = useState<string>('');
-  const [fechaEmision, setFechaEmisionState] = useState<string>('');
+  const [fechaVencimiento, setFechaVencimiento] = useState<string>('');
+  const [fechaEmision, setFechaEmision] = useState<string>('');
 
   const [errorSexo, setErrorSexo] = useState(false);
   const [mensajeErrorSexo, setMensajeErrorSexo] = useState('');
@@ -63,7 +60,6 @@ export default function registroDriver() {
   const [errorAnverso, setErrorAnverso] = useState<string | null>(null);
   const [errorReverso, setErrorReverso] = useState<string | null>(null);
 
-
   const router = useRouter();
 
   const [mensajeErrorAnverso, setMensajeErrorAnverso] = useState('');
@@ -74,15 +70,13 @@ export default function registroDriver() {
   const perfilRef = useRef<HTMLInputElement>(null);
 
   const user = useUser();
-  //const [telefonoUsuario, setTelefonoUsuario] = useState('');
-
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       setIsError(true);
     } else {
-      setNombreUsuario(user?.nombre_completo || '');
+      setNombreUsuario(user?.nombreCompleto || '');
       setIsLoading(false);
     }
   }, [user]);
@@ -93,8 +87,6 @@ export default function registroDriver() {
     }
   }, [user]);
 
-  
-
   useEffect(() => {
     const savedData = localStorage.getItem("registroDriverPaso1");
 
@@ -102,36 +94,25 @@ export default function registroDriver() {
       const parsed = JSON.parse(savedData);
       setSexo(parsed.sexo || '');
       setTelefonoUsuario(parsed.telefono || '');
-      setNroLicencia(parsed.nro_licencia || '');
+      setNroLicencia(parsed.licencia || '');
       setCategoriaLicencia(parsed.categoria || '');
-      setFechaEmisionState(parsed.fecha_emision || '');
-      setFechaVencimientoState(parsed.fecha_vencimiento || '');
+      setFechaEmision(parsed.fechaEmision || '');
+      setFechaVencimiento(parsed.fechaExpiracion || '');
     }
   }, [user]);
-
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setIsError(true);
-    } else {
-      setIsLoading(false);
-    }
-  }, []);
 
   useEffect(() => {
     const handleDragOver = (e: DragEvent) => e.preventDefault();
     const handleDrop = (e: DragEvent) => e.preventDefault();
-  
+
     window.addEventListener("dragover", handleDragOver);
     window.addEventListener("drop", handleDrop);
-  
+
     return () => {
       window.removeEventListener("dragover", handleDragOver);
       window.removeEventListener("drop", handleDrop);
     };
   }, []);
-  
 
   const validateFile = (file: File, tipo: 'anverso' | 'reverso' | 'perfil') => {
     return new Promise<{ valido: boolean; mensaje?: string }>((resolve) => {
@@ -140,7 +121,7 @@ export default function registroDriver() {
         resolve({ valido: false, mensaje: 'Solo se permiten imágenes en formato PNG.' });
         return;
       }
-  
+
       const img = new Image();
       img.onload = () => {
         if (img.width < 500 || img.height < 500) {
@@ -152,13 +133,12 @@ export default function registroDriver() {
       img.onerror = () => {
         resolve({ valido: false, mensaje: 'No se pudo cargar la imagen.' });
       };
-  
+
       img.src = URL.createObjectURL(file);
     });
   };
-  
 
- const handleFileChange = (
+  const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     tipo: 'anverso' | 'reverso' | 'perfil'
   ) => {
@@ -258,56 +238,43 @@ export default function registroDriver() {
     img.src = URL.createObjectURL(file);
   };
 
-  
-
-  
-const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
-  if (tipo === 'anverso') setAnverso(null);
-  if (tipo === 'reverso') setReverso(null);
-  if (tipo === 'perfil') setPerfil(null);
-};
-
+  const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
+    if (tipo === 'anverso') setAnverso(null);
+    if (tipo === 'reverso') setReverso(null);
+    if (tipo === 'perfil') setPerfil(null);
+  };
 
   const renderImagePreview = (file: File | null | undefined, tipo: 'anverso' | 'reverso' | 'perfil') => {
-  if (!file) return null;
-  if (!(file instanceof File)) {
-    console.error(`❌ El archivo para "${tipo}" no es válido:`, file);
-    return null;
-  }
+    if (!file) return null;
+    if (!(file instanceof File)) {
+      console.error(`❌ El archivo para "${tipo}" no es válido:`, file);
+      return null;
+    }
 
-  const src = URL.createObjectURL(file);
-  return (
-    <div className="relative w-40 h-28 mt-2">
-      <img src={src} alt={tipo} className="object-cover w-full h-full rounded" />
-      <button
-        onClick={() => removeFile(tipo)}
-        className="absolute -top-2 -right-2 bg-[#11295B] text-white rounded-full w-5 h-5 flex items-center justify-center"
-      >
-        <X size={12} />
-      </button>
-    </div>
-  );
-};
-
-
-
+    const src = URL.createObjectURL(file);
+    return (
+      <div className="relative w-40 h-28 mt-2">
+        <Image src={src} alt={tipo} className="object-cover w-full h-full rounded" width={160} height={112} />
+        <button
+          onClick={() => removeFile(tipo)}
+          className="absolute -top-2 -right-2 bg-[#11295B] text-white rounded-full w-5 h-5 flex items-center justify-center"
+        >
+          <X size={12} />
+        </button>
+      </div>
+    );
+  };
 
   const validarTelefono = (telefono: string): boolean => {
-    const regex = /^[67]\d{7}$/; 
+    const regex = /^[67]\d{7}$/;
     return regex.test(telefono);
   };
-  
 
   const validarNroLicencia = (nroLicencia: string): boolean => {
     const regex = /^[A-Z0-9]{5,10}$/;
     return regex.test(nroLicencia);
-  }
+  };
 
-  {/*const validarFechaEmision = (fecha: string): boolean => {
-    if (fecha > new Date()) {
-      return;
-  };*/}
-  
   const validarFechaEmision = (fecha: string): boolean => {
     const fechaSeleccionada = new Date(fecha);
     const hoy = new Date();
@@ -315,29 +282,15 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
     fechaMinima.setFullYear(hoy.getFullYear() - 5);
 
     return fechaSeleccionada >= fechaMinima && fechaSeleccionada <= hoy;
-    };
+  };
 
-    const validarFechaVencimiento = (fecha: string): boolean => {
-      const fechaActual = new Date();
-      const fechaSeleccionada = new Date(fecha);
-      return fechaSeleccionada >= fechaActual;
-    }
+  const validarFechaVencimiento = (fecha: string): boolean => {
+    const fechaActual = new Date();
+    const fechaSeleccionada = new Date(fecha);
+    return fechaSeleccionada >= fechaActual;
+  };
 
-    if (isLoading) return <div>Cargando...</div>;
-    if (isError) return <div>Error: No tienes permiso para acceder a esta página.</div>;
-
-    function setFechaEmision(value: string): void {
-      throw new Error('Function not implemented.');
-    }
-
-    function setFechaVencimiento(value: string): void {
-      throw new Error('Function not implemented.');
-    }
-
-
-
-
-    const validarCampos = () => {
+  const validarCampos = () => {
     let valido = true;
 
     if (!sexo) {
@@ -347,8 +300,8 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
     } else {
       setErrorSexo(false);
       setMensajeErrorSexo('');
-    }    
-    
+    }
+
     if (!telefonoUsuario) {
       setErrorTelefono(true);
       setMensajeErrorTelefono('Este campo no puede estar vacío');
@@ -382,7 +335,6 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
       setErrorLicencia(false);
       setMensajeErrorLicencia('');
     }
-  
 
     if (!categoriaLicencia) {
       setErrorCategoria(true);
@@ -391,7 +343,7 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
     } else {
       setErrorCategoria(false);
       setMensajeErrorCategoria('');
-    }    
+    }
 
     if (!fechaEmision) {
       setErrorFechaEmision(true);
@@ -413,15 +365,12 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
       }
     }
 
-
-
     if (!fechaVencimiento) {
       setErrorFechaVencimiento(true);
       setMensajeErrorFechaVencimiento('Seleccione una fecha');
       valido = false;
     } else {
       const añoVencimiento = new Date(fechaVencimiento).getFullYear();
-      const hoy = new Date();
 
       if (añoVencimiento > 9999) {
         setErrorFechaVencimiento(true);
@@ -451,92 +400,74 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
       }
     }
 
-
-
     if (!anverso) {
       setErrorAnverso('Debe subir la imagen del anverso de la licencia');
       valido = false;
     } else {
       setErrorAnverso(null);
     }
-    
+
     if (!reverso) {
       setErrorReverso('Debe subir la imagen del reverso de la licencia');
       valido = false;
     } else {
       setErrorReverso(null);
-    }    
+    }
 
     return valido;
   };
 
-
-  {/*const handleSubmit = () => {
+  const handleSubmit = async () => {
     const esValido = validarCampos();
-
-    if (!esValido) {
-      console.log("Hay errores en el formulario");
+    if (!esValido || !anverso || !reverso) {
       return;
     }
 
-    // Aquí iría la lógica para continuar, guardar datos o avanzar a otro paso
-    console.log("Formulario válido. Listo para enviar.");
-  };*/}
-    const handleSubmit = async () => {
-      const esValido = validarCampos();
-      if (!esValido || !anverso || !reverso) {
-        return;
-      }
+    const urlAnverso = await uploadImageToCloudinary(anverso);
+    const urlReverso = await uploadImageToCloudinary(reverso);
 
-      const urlAnverso = await uploadImageToCloudinary(anverso);
-      const urlReverso = await uploadImageToCloudinary(reverso);
+    if (!urlAnverso || !urlReverso) {
+      return;
+    }
 
-      if (!urlAnverso || !urlReverso) {
-        return;
-      }
-
-      const data = {
-        sexo,
-        telefono: telefonoUsuario,
-        nro_licencia: NroLicencia,
-        categoria: categoriaLicencia,
-        fecha_emision: fechaEmision,
-        fecha_vencimiento: fechaVencimiento,
-        anversoUrl: urlAnverso,
-        reversoUrl: urlReverso
-      };
-
-      if (user?.email) {
-        localStorage.setItem("registroDriverPaso1", JSON.stringify(data));
-      }
-
-
-      router.push("/home/Driver/seleccionarRenter");
+    const data = {
+      sexo,
+      telefono: telefonoUsuario,
+      nro_licencia: NroLicencia,
+      categoria: categoriaLicencia,
+      fecha_emision: fechaEmision,
+      fecha_vencimiento: fechaVencimiento,
+      anversoUrl: urlAnverso,
+      reversoUrl: urlReverso
     };
 
-    const limitarAñoMaximo = (e: React.FormEvent<HTMLInputElement>) => {
-      const input = e.currentTarget;
-      const value = input.value;
+    if (user?.email) {
+      localStorage.setItem("registroDriverPaso1", JSON.stringify(data));
+    }
 
-      const partes = value.split("-");
-      if (partes.length === 3) {
-        const año = partes[0];
-        if (año.length > 4 || parseInt(año) > 2099) {
-          input.value = "0000-01-01"; 
-          const changeEvent = new Event('input', { bubbles: true });
-          input.dispatchEvent(changeEvent);
-        }
+    router.push("/home/Driver/seleccionarRenter");
+  };
+
+  const limitarAñoMaximo = (e: React.FormEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    const value = input.value;
+
+    const partes = value.split("-");
+    if (partes.length === 3) {
+      const año = partes[0];
+      if (año.length > 4 || parseInt(año) > 2099) {
+        input.value = "0000-01-01";
+        const changeEvent = new Event('input', { bubbles: true });
+        input.dispatchEvent(changeEvent);
       }
-    };
+    }
+  };
 
-
+  if (isLoading) return <div>Cargando...</div>;
+  if (isError) return <div>Error: No tienes permiso para acceder a esta página.</div>;
 
   return (
-    <div className="bg-[var(--blanco)] min-h-screen flex flex-col"> 
-      <div className="fixed top-0 w-full z-50 bg-white shadow-none border-b border-gray-200">
-        <NavbarPerfilUsuario />
-      </div>
-
+    <div className="bg-[var(--blanco)] min-h-screen flex flex-col">
       <div className="mt-28 px-8 w-full flex justify-center">
         <div className="max-w-[1300px] w-full">
           <h2 className="text-[1.8rem] font-bold mb-4 text-[#11295B] text-center">REGISTRO COMO DRIVER</h2>
@@ -548,11 +479,8 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
         </div>
       </div>
 
-
       <div className="mt-7 w-full flex justify-center">
         <div className="p-2 w-full max-w-[1300px] flex gap-8">
-          
-
           {/* Columna izquierda - Datos personales */}
           <div className="w-1/2 space-y-4">
             <h2 className="text-2xl font-bold text-[#11295B] mb-6">DATOS PERSONALES Y DE LICENCIA</h2>
@@ -602,11 +530,10 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                       setMensajeErrorSexo('');
                     }
                   }}
-                  className={`w-full pt-6 pb-2 pl-12 pr-3 rounded-lg border focus:outline-none focus:ring-1 ${
-                    errorSexo
-                      ? 'border-red-500 text-red-500 focus:ring-red-500'
-                      : 'border-[#11295B] text-[#11295B] focus:ring-[#11295B]'
-                  }`}
+                  className={`w-full pt-6 pb-2 pl-12 pr-3 rounded-lg border focus:outline-none focus:ring-1 ${errorSexo
+                    ? 'border-red-500 text-red-500 focus:ring-red-500'
+                    : 'border-[#11295B] text-[#11295B] focus:ring-[#11295B]'
+                    }`}
                   required
                 >
                   <option value="" disabled hidden>Seleccionar</option>
@@ -618,10 +545,7 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                   <p className="text-sm text-red-500 mt-1">{mensajeErrorSexo}</p>
                 )}
               </div>
-
             </div>
-
-
 
             <div className="relative w-full mt-4">
               <div className="absolute left-4 top-4">
@@ -653,8 +577,8 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                     onChange={(e) => {
                       const input = e.target.value;
 
-                        if (!/^\d*$/.test(input)) return;
-                        if (input.length > 8) return;
+                      if (!/^\d*$/.test(input)) return;
+                      if (input.length > 8) return;
 
                       setTelefonoUsuario(input);
 
@@ -672,31 +596,25 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                         setMensajeErrorTelefono('');
                       }
                     }}
-                    className={`w-full pl-12 pr-4 pt-6 pb-2 rounded-lg border focus:outline-none focus:ring-1 ${
-                      errorTelefono
-                        ? 'border-red-500 text-red-500 placeholder:text-red-400 focus:ring-red-500'
-                        : 'border-[#11295B] text-[#11295B] placeholder:text-[#11295B]/50 focus:ring-[#11295B]'
-                    }`}
+                    className={`w-full pl-12 pr-4 pt-6 pb-2 rounded-lg border focus:outline-none focus:ring-1 ${errorTelefono
+                      ? 'border-red-500 text-red-500 placeholder:text-red-400 focus:ring-red-500'
+                      : 'border-[#11295B] text-[#11295B] placeholder:text-[#11295B]/50 focus:ring-[#11295B]'
+                      }`}
                   />
                   {errorTelefono && (
                     <p className="text-sm text-red-500 mt-1">{mensajeErrorTelefono}</p>
                   )}
-                  <span className={`absolute left-12 top-[0.4rem] text-xs font-bold px-1 ${
-                    errorTelefono ? 'text-red-500' : 'text-[#11295B]'
-                  }`}>
+                  <span className={`absolute left-12 top-[0.4rem] text-xs font-bold px-1 ${errorTelefono ? 'text-red-500' : 'text-[#11295B]'
+                    }`}>
                     Teléfono
                   </span>
                 </>
               )}
             </div>
 
-
-
-
-
             <div className="relative w-full mt-4">
               <div className="absolute left-4 top-4">
-              <LicenciaConductor className={`w-6 h-6 ${errorLicencia ? 'text-red-500' : 'text-[#11295B]'}`} />
+                <LicenciaConductor className={`w-6 h-6 ${errorLicencia ? 'text-red-500' : 'text-[#11295B]'}`} />
               </div>
               <input
                 type="text"
@@ -727,11 +645,10 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                     setMensajeErrorLicencia('');
                   }
                 }}
-                className={`w-full pl-12 pr-4 pt-6 pb-2 rounded-lg border focus:outline-none focus:ring-1 ${
-                  errorLicencia
-                    ? 'border-red-500 text-red-500 placeholder:text-red-400 focus:ring-red-500'
-                    : 'border-[#11295B] text-[#11295B] placeholder:text-[#11295B]/50 focus:ring-[#11295B]'
-                }`}
+                className={`w-full pl-12 pr-4 pt-6 pb-2 rounded-lg border focus:outline-none focus:ring-1 ${errorLicencia
+                  ? 'border-red-500 text-red-500 placeholder:text-red-400 focus:ring-red-500'
+                  : 'border-[#11295B] text-[#11295B] placeholder:text-[#11295B]/50 focus:ring-[#11295B]'
+                  }`}
               />
               {errorLicencia && mensajeErrorLicencia && (
                 <p className="text-sm text-red-500 mt-1">{mensajeErrorLicencia}</p>
@@ -740,8 +657,6 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                 Nro de licencia
               </span>
             </div>
-
-
 
             <div className="relative w-full mt-4">
               <div className="absolute left-4 top-4">
@@ -766,11 +681,10 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                     setMensajeErrorCategoria('');
                   }
                 }}
-                className={`w-full pt-6 pb-2 pl-12 pr-3 rounded-lg border focus:outline-none focus:ring-1 ${
-                  errorCategoria
-                    ? 'border-red-500 text-red-500 focus:ring-red-500'
-                    : 'border-[#11295B] text-[#11295B] focus:ring-[#11295B]'
-                }`}
+                className={`w-full pt-6 pb-2 pl-12 pr-3 rounded-lg border focus:outline-none focus:ring-1 ${errorCategoria
+                  ? 'border-red-500 text-red-500 focus:ring-red-500'
+                  : 'border-[#11295B] text-[#11295B] focus:ring-[#11295B]'
+                  }`}
                 required
               >
                 <option value="" disabled hidden>Seleccionar</option>
@@ -805,10 +719,9 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                   value={fechaEmision}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setFechaEmisionState(value);
+                    setFechaEmision(value);
 
                     const esValida = validarFechaEmision(value);
-                    const esMayorQueVencimiento = fechaVencimiento && new Date(value) > new Date(fechaVencimiento);
 
                     if (!esValida) {
                       const fechaSeleccionada = new Date(value);
@@ -831,11 +744,10 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                       setMensajeErrorFechaEmision('');
                     }
                   }}
-                  className={`w-full pl-12 pr-4 pt-6 pb-2 rounded-lg border ${
-                    errorFechaEmision
-                      ? 'border-red-500 text-red-500 placeholder:text-red-400 focus:ring-red-500'
-                      : 'border-[#11295B] text-[#11295B] placeholder:text-[#11295B]/50 focus:ring-[#11295B]'
-                  } focus:outline-none focus:ring-1`}
+                  className={`w-full pl-12 pr-4 pt-6 pb-2 rounded-lg border ${errorFechaEmision
+                    ? 'border-red-500 text-red-500 placeholder:text-red-400 focus:ring-red-500'
+                    : 'border-[#11295B] text-[#11295B] placeholder:text-[#11295B]/50 focus:ring-[#11295B]'
+                    } focus:outline-none focus:ring-1`}
                 />
                 {errorFechaEmision && mensajeErrorFechaEmision && (
                   <p className="text-sm text-red-500 mt-1">{mensajeErrorFechaEmision}</p>
@@ -862,7 +774,7 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                   value={fechaVencimiento}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setFechaVencimientoState(value);
+                    setFechaVencimiento(value);
 
                     if (!value) {
                       setErrorFechaVencimiento(true);
@@ -900,11 +812,10 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
                     setErrorFechaVencimiento(false);
                     setMensajeErrorFechaVencimiento('');
                   }}
-                  className={`w-full pl-12 pr-4 pt-6 pb-2 rounded-lg border ${
-                    errorFechaVencimiento
-                      ? 'border-red-500 text-red-500 placeholder:text-red-400 focus:ring-red-500'
-                      : 'border-[#11295B] text-[#11295B] placeholder:text-[#11295B]/50 focus:ring-[#11295B]'
-                  } focus:outline-none focus:ring-1`}
+                  className={`w-full pl-12 pr-4 pt-6 pb-2 rounded-lg border ${errorFechaVencimiento
+                    ? 'border-red-500 text-red-500 placeholder:text-red-400 focus:ring-red-500'
+                    : 'border-[#11295B] text-[#11295B] placeholder:text-[#11295B]/50 focus:ring-[#11295B]'
+                    } focus:outline-none focus:ring-1`}
                 />
                 {errorFechaVencimiento && mensajeErrorFechaVencimiento && (
                   <p className="text-sm text-red-500 mt-1">{mensajeErrorFechaVencimiento}</p>
@@ -921,107 +832,107 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
           <div className="w-1/2 space-y-6">
             <h2 className="text-2xl font-bold text-[#11295B] mb-2">DATOS PERSONALES Y DE LICENCIA</h2>
 
-             {/* Imagen anverso */}
-              <div className="bg-gray-100 p-4 rounded-xl">
-                <label className="font-semibold text-[#11295B]">Imagen anverso de la Licencia</label>
-                <p className="text-sm text-gray-600">Toma la foto en un lugar bien iluminado</p>
-                <div
-                  className="mt-2 border border-dashed border-gray-400 bg-gray-200 rounded text-center cursor-pointer hover:bg-gray-300 flex items-center justify-center h-20"
-                  onClick={() => anversoRef.current?.click()}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const file = e.dataTransfer.files?.[0];
-                    if (!file) return;
+            {/* Imagen anverso */}
+            <div className="bg-gray-100 p-4 rounded-xl">
+              <label className="font-semibold text-[#11295B]">Imagen anverso de la Licencia</label>
+              <p className="text-sm text-gray-600">Toma la foto en un lugar bien iluminado</p>
+              <div
+                className="mt-2 border border-dashed border-gray-400 bg-gray-200 rounded text-center cursor-pointer hover:bg-gray-300 flex items-center justify-center h-20"
+                onClick={() => anversoRef.current?.click()}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files?.[0];
+                  if (!file) return;
 
-                    if (file.type !== "image/png") {
-                      setErrorAnverso("Solo se permiten imágenes en formato PNG.");
-                      setAnverso(null);
-                      return;
-                    }
+                  if (file.type !== "image/png") {
+                    setErrorAnverso("Solo se permiten imágenes en formato PNG.");
+                    setAnverso(null);
+                    return;
+                  }
 
-                    const fakeEvent = {
-                      target: { files: [file] }
-                    } as unknown as React.ChangeEvent<HTMLInputElement>;
+                  const fakeEvent = {
+                    target: { files: [file] }
+                  } as unknown as React.ChangeEvent<HTMLInputElement>;
 
-                    handleFileChange(fakeEvent, "anverso");
-                  }}
+                  handleFileChange(fakeEvent, "anverso");
+                }}
 
-                >
-                  <span className="text-[#11295B] font-semibold z-10 relative">
-                    {anverso ? 'Cambiar imagen' : 'Subir imagen / Arrastrar aquí'}
-                  </span>
-                </div>
-
-                <input
-                  ref={anversoRef}
-                  type="file"
-                  accept="image/png"
-                  className="hidden"
-                  onChange={(e) => handleFileChange(e, 'anverso')}
-                />
-                {renderImagePreview(anverso, 'anverso')}
-                {mensajeErrorAnverso && (
-                  <p className="text-sm text-red-500 mt-2">{mensajeErrorAnverso}</p>
-                )}
-
-                {errorAnverso && (
-                  <p className="text-sm text-red-500 mt-1">{errorAnverso}</p>
-                )}
+              >
+                <span className="text-[#11295B] font-semibold z-10 relative">
+                  {anverso ? 'Cambiar imagen' : 'Subir imagen / Arrastrar aquí'}
+                </span>
               </div>
 
-              {/* Imagen reverso */}
-              <div className="bg-gray-100 p-4 rounded-xl">
-                <label className="font-semibold text-[#11295B]">Imagen reverso de la Licencia</label>
-                <p className="text-sm text-gray-600">Toma la foto en un lugar bien iluminado</p>
-                <div
-                  className="mt-2 border border-dashed border-gray-400 bg-gray-200 rounded text-center cursor-pointer hover:bg-gray-300 flex items-center justify-center h-20"
-                  onClick={() => reversoRef.current?.click()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const file = e.dataTransfer.files?.[0];
-                    if (!file) return;
+              <input
+                ref={anversoRef}
+                type="file"
+                accept="image/png"
+                className="hidden"
+                onChange={(e) => handleFileChange(e, 'anverso')}
+              />
+              {renderImagePreview(anverso, 'anverso')}
+              {mensajeErrorAnverso && (
+                <p className="text-sm text-red-500 mt-2">{mensajeErrorAnverso}</p>
+              )}
 
-                    if (file.type !== "image/png") {
-                      setErrorReverso("Solo se permiten imágenes en formato PNG.");
-                      setReverso(null);
-                      return;
-                    }
+              {errorAnverso && (
+                <p className="text-sm text-red-500 mt-1">{errorAnverso}</p>
+              )}
+            </div>
 
-                    const fakeEvent = {
-                      target: { files: [file] }
-                    } as unknown as React.ChangeEvent<HTMLInputElement>;
+            {/* Imagen reverso */}
+            <div className="bg-gray-100 p-4 rounded-xl">
+              <label className="font-semibold text-[#11295B]">Imagen reverso de la Licencia</label>
+              <p className="text-sm text-gray-600">Toma la foto en un lugar bien iluminado</p>
+              <div
+                className="mt-2 border border-dashed border-gray-400 bg-gray-200 rounded text-center cursor-pointer hover:bg-gray-300 flex items-center justify-center h-20"
+                onClick={() => reversoRef.current?.click()}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const file = e.dataTransfer.files?.[0];
+                  if (!file) return;
 
-                    handleFileChange(fakeEvent, "reverso");
-                  }}
+                  if (file.type !== "image/png") {
+                    setErrorReverso("Solo se permiten imágenes en formato PNG.");
+                    setReverso(null);
+                    return;
+                  }
 
-                  onDragOver={(e) => e.preventDefault()}
-                >
-                  <span className="text-[#11295B] font-semibold z-10 relative">
-                    {reverso ? 'Cambiar imagen' : 'Subir imagen / Arrastrar aquí'}
-                  </span>
-                </div>
+                  const fakeEvent = {
+                    target: { files: [file] }
+                  } as unknown as React.ChangeEvent<HTMLInputElement>;
 
-                <input
-                  ref={reversoRef}
-                  type="file"
-                  accept="image/png"
-                  className="hidden"
-                  onChange={(e) => handleFileChange(e, 'reverso')}
-                />
-                {renderImagePreview(reverso, 'reverso')}
-                {mensajeErrorReverso && (
-                  <p className="text-sm text-red-500 mt-2">{mensajeErrorReverso}</p>
-                )}
+                  handleFileChange(fakeEvent, "reverso");
+                }}
 
-                {errorReverso && (
-                  <p className="text-sm text-red-500 mt-1">{errorReverso}</p>
-                )}
+                onDragOver={(e) => e.preventDefault()}
+              >
+                <span className="text-[#11295B] font-semibold z-10 relative">
+                  {reverso ? 'Cambiar imagen' : 'Subir imagen / Arrastrar aquí'}
+                </span>
               </div>
 
-            
+              <input
+                ref={reversoRef}
+                type="file"
+                accept="image/png"
+                className="hidden"
+                onChange={(e) => handleFileChange(e, 'reverso')}
+              />
+              {renderImagePreview(reverso, 'reverso')}
+              {mensajeErrorReverso && (
+                <p className="text-sm text-red-500 mt-2">{mensajeErrorReverso}</p>
+              )}
+
+              {errorReverso && (
+                <p className="text-sm text-red-500 mt-1">{errorReverso}</p>
+              )}
+            </div>
+
+
             <div className="flex justify-end mt-1 pr-6">
-            
+
 
 
               <div className="flex justify-end gap-8 mt-1 px-6">
@@ -1046,6 +957,6 @@ const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
           </div>
         </div>
       </div>
-  </div>
+    </div>
   );
 }

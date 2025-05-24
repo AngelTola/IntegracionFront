@@ -1,11 +1,7 @@
 @import "tailwindcss";
 
 :root {
-<<<<<<< HEAD
-  --background: #ffffff;
-=======
   --background-principal: #ffffff;
->>>>>>> 1677a42da72c4afd103920ac52a6c40a4ebc9548
   --foreground: #171717;
   --negro: #000000;
   --azul-oscuro: #11295B;
@@ -15,23 +11,17 @@
   --blanco: #FFFFFF;
   --rojo: #F85959;
   --verde: #219653;
-<<<<<<< HEAD
-=======
   --azul-opaco: rgba(17, 41, 91, 0.5);
->>>>>>> 1677a42da72c4afd103920ac52a6c40a4ebc9548
   --fuente-principal: 'Inter', sans-serif;
   --tamaña-bold: bold;
   --tamaño-regular: 500;
   --tamaño-black: 900;
   --sombra: 0px 4px 3px rgba(1, 0, 0, 0.165);
-<<<<<<< HEAD
-=======
   --H1: 2.488rem;
   --H2: 2.074rem;
   --H3: 1.728rem;
   --H4: 1.44rem;
   --H5: 1.2rem;
->>>>>>> 1677a42da72c4afd103920ac52a6c40a4ebc9548
 }
 
 @theme inline {
@@ -43,11 +33,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-<<<<<<< HEAD
-    --background: #0c0c0c;
-=======
     --background: #0a0a0a;
->>>>>>> 1677a42da72c4afd103920ac52a6c40a4ebc9548
     --foreground: #ededed;
   }
 }
@@ -57,15 +43,6 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-<<<<<<< HEAD
-html, body {
-  height: 100%;
-  background-color: #FFFFFF;
-}
-
-.react-datepicker-popper {
-  z-index: 9999 !important;
-=======
 
 /* Ocultar scroll horizontal */
 .scrollbar-hide::-webkit-scrollbar {
@@ -74,5 +51,4 @@ html, body {
 .scrollbar-hide {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
->>>>>>> 1677a42da72c4afd103920ac52a6c40a4ebc9548
 }

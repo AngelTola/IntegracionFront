@@ -2,8 +2,7 @@
 
 ////////////back///////////
 import { useState } from 'react';
-import { login } from '@/libs/authServices'; // Importa tu servicio
-import { useRouter } from 'next/navigation';
+import { login } from '@/libs/authServices';
 ///////////////////////////
 export default function LoginModal({ onClose, onRegisterClick, onPasswordRecoveryClick}: { 
   onClose: () => void; 
@@ -37,8 +36,6 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
   //Efecto de boton de activar o desactivar poder ver la contraseña
   const [showPassword, setShowPassword] = useState(false);
   
-  const router = useRouter();
-
   const handleLogin = async () => {
     setError('');
     setErrorPasswordLength('');
@@ -49,8 +46,6 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
     setErrorPasswordLength('');
     setErrorDomain('');
     setErrorAtSymbol('');
-    
-
     
     //Dominio
     setErrorDomain('');
@@ -86,8 +81,6 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
       setHasLoginError(true);
       return;
     }
-
-
     
     const emailDomain = email.substring(email.indexOf('@'));
   
@@ -116,7 +109,7 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
       setError('');
       setHasLoginError(false);
       // Puedes hacer algo con el resultado aquí, como guardar el token o redirigir
-      router.push('/home/homePage');
+      window.location.reload();
     }  catch (error) {
       console.error('Error al iniciar sesión:', error);
       /*setError(error?.response?.data?.message || 'Error al iniciar sesión.');
@@ -126,8 +119,6 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
     }
 
   };
-  /////////////////////////////////
-
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-[9999] bg-black/20">

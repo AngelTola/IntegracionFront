@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import NavbarPerfilUsuario from "@/app/components/navbar/NavbarPerfilUsuario";
 import PerfilIcon from "@/app/components/Icons/Perfil";
 import UserIcon from "@/app/components/Icons/User";
 import PhoneIcon from "@/app/components/Icons/Phone";
@@ -10,19 +9,20 @@ import CategoriaIcon from "@/app/components/Icons/Categoria";
 import CalendarIcon from "@/app/components/Icons/Calendar";
 import { SolarGalleryOutline } from "@/app/components/Icons/Gallery";
 import { useUser } from '@/hooks/useUser';
+import Image from "next/image"
 
 // Tipo para los datos del driver
 type DriverData = {
   usuario: {
-    nombre_completo: string;
-    foto_perfil?: string;
+    nombreCompleto: string;
+    fotoPerfil?: string;
   };
   sexo: string;
   telefono: string;
-  nro_licencia: string;
+  licencia: string;
   categoria: string;
-  fecha_emision: string;
-  fecha_vencimiento: string;
+  fechaEmision: string;
+  fechaExpiracion: string;
   anversoUrl: string;
   reversoUrl: string;
 };
@@ -76,16 +76,15 @@ export default function UserPerfilDriver() {
   }, []);
 
   useEffect(() => {
-    if (user?.foto_perfil) {
-      setImagePreviewUrl(`http://localhost:3001${user.foto_perfil}`);
-      console.log('✅ Foto cargada:', `http://localhost:3001${user.foto_perfil}`);
+    if (user?.fotoPerfil) {
+      setImagePreviewUrl(`http://localhost:3001${user.fotoPerfil}`);
+      console.log('✅ Foto cargada:', `http://localhost:3001${user.fotoPerfil}`);
     }
   }, [user]);
   if (!user) return null;
 
   return (
     <>
-      <NavbarPerfilUsuario />
 
       <main className="min-h-screen bg-white text-[#11295B] px-10 py-10">
         <h1 className="text-center text-2xl font-bold mb-10">
@@ -105,7 +104,7 @@ export default function UserPerfilDriver() {
               <div className="w-full md:w-[160px] flex-shrink-0 flex justify-center md:justify-start">
                 <div className="border-2 border-gray-300 rounded-2xl overflow-hidden w-[120px] h-[120px]">
                   {imagePreviewUrl ? (
-                    <img
+                    <Image
                       src={imagePreviewUrl}
                       alt="Foto de perfil"
                       className="w-full h-full object-cover"
@@ -128,7 +127,7 @@ export default function UserPerfilDriver() {
                       <input
                         id="nombre"
                         type="text"
-                        value={driverData.usuario.nombre_completo || ""}
+                        value={driverData.usuario.nombreCompleto || ""}
                         className="w-full pl-10 py-2 border-2 border-black rounded shadow-[0_4px_2px_-2px_rgba(0,0,0,0.6)] text-[#11295B] font-semibold"
                         readOnly
                       />
@@ -172,7 +171,7 @@ export default function UserPerfilDriver() {
                     <div className="relative">
                       <input
                         type="text"
-                        value={driverData.nro_licencia || ""}
+                        value={driverData.licencia || ""}
                         className="w-full pl-10 py-2 border-2 border-black rounded shadow-[0_4px_2px_-2px_rgba(0,0,0,0.6)] text-[#11295B] font-semibold"
                         readOnly
                       />
@@ -208,7 +207,7 @@ export default function UserPerfilDriver() {
                     <div className="relative">
                       <input
                         type="date"
-                        value={driverData.fecha_emision?.split("T")[0] || ""}
+                        value={driverData.fechaEmision?.split("T")[0] || ""}
                         className="w-full pl-10 py-2 border-2 border-black rounded shadow-[0_4px_2px_-2px_rgba(0,0,0,0.6)] text-[#11295B] font-semibold"
                         readOnly
                       />
@@ -220,7 +219,7 @@ export default function UserPerfilDriver() {
                     <div className="relative">
                       <input
                         type="date"
-                        value={driverData.fecha_vencimiento?.split("T")[0] || ""}
+                        value={driverData.fechaExpiracion?.split("T")[0] || ""}
                         className="w-full pl-10 py-2 border-2 border-black rounded shadow-[0_4px_2px_-2px_rgba(0,0,0,0.6)] text-[#11295B] font-semibold"
                         readOnly
                       />
@@ -243,7 +242,7 @@ export default function UserPerfilDriver() {
               </h2>
               <div className="flex justify-around">
                 {driverData.anversoUrl ? (
-                  <img
+                  <Image
                     src={driverData.anversoUrl}
                     alt="Anverso Licencia"
                     className="w-60 h-60 object-contain rounded shadow cursor-pointer"
@@ -256,7 +255,7 @@ export default function UserPerfilDriver() {
                 )}
 
                 {driverData.reversoUrl ? (
-                  <img
+                  <Image
                     src={driverData.reversoUrl}
                     alt="Reverso Licencia"
                     className="w-60 h-60 object-contain rounded shadow cursor-pointer"
@@ -286,7 +285,7 @@ export default function UserPerfilDriver() {
             className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[9999]"
             onClick={() => setZoomUrl(null)}
           >
-            <img
+            <Image
               src={zoomUrl}
               alt="Imagen ampliada"
               className="max-w-[90vw] max-h-[90vh] object-contain rounded shadow-lg"

@@ -3,7 +3,7 @@
 import { BASE_URL } from '@/libs/autoServices';
 import { useState } from 'react';
 
-const validDomains = ['@gmail.com', '@hotmail.com', '@outlook.com', '@yahoo.com']; // <-- Aquí defines los dominios válidos
+const validDomains = ['@gmail.com', '@hotmail.com', '@outlook.com', '@yahoo.com'];
 
 const PasswordRecoveryModal = ({
   onClose,

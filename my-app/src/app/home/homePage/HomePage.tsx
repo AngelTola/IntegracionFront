@@ -4,30 +4,23 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
 import { useSearchParams } from "next/navigation";
-import FiltersBar from '@/app/components/filters/FiltersBar';
-import Footer from '@/app/components/footer/FooterLogin';
-import LoginModal from '@/app/components/auth/authInicioSesion/LoginModal';
-import RegisterModal from '@/app/components/auth/authregistro/RegisterModal';
 import VehicleDataModal from '@/app/components/auth/authRegistroHost/VehicleDataModal';
 import PaymentModal from '@/app/components/auth/authRegistroHost/PaymentModal';
 import CompleteProfileModal from '@/app/components/auth/authRegistroHost/CompleteProfileModal';
-import ModalLoginExitoso from '@/app/components/modals/ModalLoginExitoso';
-
+import { BASE_URL } from '@/libs/autoServices';
 
 export default function MainHome() {
   const [activeModal, setActiveModal] = useState<'login' | 'register' | 'vehicleData' | 'paymentData' | 'completeProfile' | 'succesModal' | null>(null);
-
-  const [showLoginSuccessModal, setShowLoginSuccessModal] = useState(false);
 
   const [vehicleData, setVehicleData] = useState<{
     placa: string;
     soat: string;
     imagenes: File[];
-    id_vehiculo: number;
+    idAuto: number;
   } | null>(null);
 
   const [paymentData, setPaymentData] = useState<{
-    tipo: "card" | "qr" | "cash";
+    tipo: "TARJETA_DEBITO" | "QR" | "EFECTIVO";
     cardNumber?: string;
     expiration?: string;
     cvv?: string;
@@ -48,14 +41,6 @@ export default function MainHome() {
       router.push('/');
     }
   }, [user, router]);
-  
-  useEffect(() => {
-    const loginSuccess = localStorage.getItem('loginSuccess');
-    if (loginSuccess === 'true') {
-      setShowLoginSuccessModal(true);
-      localStorage.removeItem('loginSuccess');
-    }
-  }, []);
 
   const displayToast = (message: string) => {
     setToastMessage(message);
@@ -67,14 +52,14 @@ export default function MainHome() {
     placa: string;
     soat: string;
     imagenes: File[];
-    id_vehiculo: number;
+    idAuto: number;
   }) => {
     setVehicleData(data);
     setActiveModal("paymentData");
   };
 
   const handlePaymentDataSubmit = (data: {
-  tipo: "card" | "qr" | "cash";
+  tipo: "TARJETA_DEBITO" | "QR" | "EFECTIVO";
   cardNumber?: string;
   expiration?: string;
   cvv?: string;
@@ -99,7 +84,6 @@ export default function MainHome() {
     if (registroExitoso === "1") {
       setShowSuccessModal(true);
 
-      // Quitar el query param sin recargar la página
       const newUrl = window.location.pathname;
       window.history.replaceState(null, "", newUrl);
     }
@@ -108,35 +92,6 @@ export default function MainHome() {
   
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background-principal)]">
-
-      <header className="/* headerFilters */">
-        <FiltersBar />
-      </header>
-
-      <main className="flex-grow p-8">
-        <div className="/* scrollContent */">
-          <p>Contenido principal del usuario (tarjetas, información, etc.).</p>
-        </div>
-      </main>
-
-      <footer>
-        <Footer />
-      </footer>
-
-      {activeModal === 'login' && (
-        <LoginModal
-          onClose={() => setActiveModal(null)}
-          onRegisterClick={() => setActiveModal('register')}
-          onPasswordRecoveryClick={() => console.log('Recuperar contraseña')}
-        />
-      )}
-
-      {activeModal === 'register' && (
-        <RegisterModal
-          onClose={() => setActiveModal(null)}
-          onLoginClick={() => setActiveModal('login')}
-        />
-      )}
 
       {activeModal === 'vehicleData' && (
         <VehicleDataModal
@@ -149,9 +104,9 @@ export default function MainHome() {
         <PaymentModal
           onNext={handlePaymentDataSubmit}
           onClose={async () => {
-            if (vehicleData?.id_vehiculo) {
+            if (vehicleData?.idAuto) {
               const token = localStorage.getItem("token");
-              await fetch(`http://localhost:3001/api/vehiculos/eliminar-vehiculo/${vehicleData.id_vehiculo}`, {
+              await fetch(`${BASE_URL}/vehiculos/eliminar-vehiculo/${vehicleData.idAuto}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${token}` },
               });
@@ -213,13 +168,6 @@ export default function MainHome() {
             <p className="text-gray-700">Tu registro como driver se completó exitosamente.</p>
           </div>
         </div>
-      )}
-
-
-
-      
-      {showLoginSuccessModal && (
-        <ModalLoginExitoso onClose={() => setShowLoginSuccessModal(false)} />
       )}
     </div>
   );

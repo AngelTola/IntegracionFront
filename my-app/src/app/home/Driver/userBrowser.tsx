@@ -23,7 +23,6 @@ const UserBrowser = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Imprimir los datos del paso 1
     const datosPaso1 = localStorage.getItem("registroDriverPaso1");
     if (datosPaso1) {
       console.log("📦 Datos del paso 1 recibidos:", JSON.parse(datosPaso1));
@@ -31,7 +30,6 @@ const UserBrowser = () => {
       console.warn("⚠️ No se encontraron datos del paso 1 en localStorage");
     }
   
-    // Cargar usuarios desde backend
     fetch(`${BASE_URL}/usuarios/renters`)
       .then((res) => res.json())
       .then((data) => setAllUsers(data))
@@ -39,8 +37,6 @@ const UserBrowser = () => {
       .finally(() => setLoading(false));
   }, []);
   
-
-  // Cargar usuarios seleccionados desde localStorage
   useEffect(() => {
     const stored = localStorage.getItem("selectedRenters");
     if (stored) {
@@ -48,7 +44,6 @@ const UserBrowser = () => {
     }
   }, []);
 
-  // Guardar en localStorage cuando cambie la selección
   useEffect(() => {
     localStorage.setItem("selectedRenters", JSON.stringify(selectedUsers));
   }, [selectedUsers]);
@@ -125,25 +120,23 @@ const UserBrowser = () => {
       console.log("🧾 Detalle del error:", errorText);
   
       if (!res.ok) throw new Error("Falló el registro");
-      // ✅ Bandera para activar modal en homePage
       localStorage.setItem("registroExitosoDriver", "true");
-
-      // ✅ Redirección automática
-      router.push("/home/homePage?registroExitoso=1");
-      // setShowSuccessModal(true); 
-      //alert("Driver registrado con éxito ✅");
-
-      //window.location.href = "/home/homePage?success=driver";
-
+      window.dispatchEvent(new Event('authChange'));
+      window.dispatchEvent(new CustomEvent('driverRegistered',{
+        detail: {success: true}
+      }))
   
       setSelectedUsers([]);
       localStorage.removeItem("selectedRenters");
       localStorage.removeItem("registroDriverPaso1");
+      localStorage.setItem('registroDriver', '1');
+      router.push("/home");
     } catch (err) {
       console.error("Error:", err);
       alert("❌ Error al registrar driver");
     }
   };
+
   const scrollLeft = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
@@ -155,8 +148,6 @@ const UserBrowser = () => {
       scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
     }
   };  
-  
-
   
   const UserCard = ({
     user,
@@ -182,6 +173,8 @@ const UserBrowser = () => {
       >
         <div className="flex items-center space-x-4">
           <Image
+            width={128}
+            height={128}
             src={profileImageUrl}
             alt={`Foto de ${user.nombreCompleto}`}
             className="w-12 h-12 rounded-full object-cover border border-gray-200"
@@ -248,25 +241,6 @@ const UserBrowser = () => {
           />
         </div>
 
-        {/* Lista de cards 
-        {loading ? (
-          <p className="text-center">Cargando usuarios...</p>
-        ) : filteredUsers.length === 0 ? (
-          <p className="text-center text-gray-600">No se encontraron usuarios.</p>
-        ) : (
-          <div className="overflow-x-auto pb-4">
-            <div className="flex space-x-4 w-max">
-              {filteredUsers.map((user) => (
-                <UserCard
-                  key={user.id_usuario}
-                  user={user}
-                  isSelected={selectedUsers.some((u) => u.id_usuario === user.id_usuario)}
-                  onAction={handleAddUser}
-                />
-              ))}
-            </div>
-          </div>
-        )}*/}
 
         {loading ? (
           <p className="text-center">Cargando usuarios...</p>

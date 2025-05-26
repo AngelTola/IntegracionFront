@@ -29,13 +29,11 @@ export default function CompleteProfileModal({
   const [phoneMessage, setPhoneMessage] = useState("");
   const [error, setError] = useState("");
   const userEmail = localStorage.getItem("google_email");
-  const [termsError, setTermsError] = useState(false);  // Estado para manejar el error de aceptación
+  const [termsError, setTermsError] = useState(false);
 
   const daysInMonth = birthMonth && birthYear
   ? getDaysInMonth(Number(birthMonth), Number(birthYear))
   : 31;
-
-  //manejo de errores
 
   let hasErrors = false;
 
@@ -153,7 +151,7 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
         const res = await fetch(`${BASE_URL}/check-phone`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ telefono: parseInt(cleanPhone) }),
+          body: JSON.stringify({ telefono: cleanPhone }),
         });
 
         const data = await res.json();
@@ -172,9 +170,7 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
         return;
       }
     }
-
     setError("");
-
     try {
       const res = await fetch(`${BASE_URL}/update-profile`, {
         method: "PATCH",
@@ -184,9 +180,9 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
         credentials: "include",
         body: JSON.stringify({
           email: userEmail,
-          nombre_completo: name.trim(),
-          fecha_nacimiento: birthDate.toISOString(),
-          telefono: "+591" + cleanPhone,
+          nombreCompleto: name.trim(),
+          fechaNacimiento: birthDate.toISOString(),
+          telefono: cleanPhone,
         }),
       });
 
@@ -197,7 +193,7 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
           alert(
             "Esta cuenta ya fue registrada con correo y contraseña. Por favor inicia sesión manualmente."
           );
-          return; //No continuar ni cerrar el modal
+          return;
         }
 
         throw new Error(data.message || "No se pudo actualizar el perfil");
@@ -206,10 +202,8 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
       onComplete({ name: name.trim(), birthDate: birthDate.toISOString() });
 
       if (onSuccess) {
-        onSuccess(); // ✅ activa el modal de éxito
+        onSuccess();
       }
-      
-
 
     } catch (err) {
       console.error("Error al guardar datos de perfil", err);

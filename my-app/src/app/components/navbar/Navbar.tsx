@@ -6,14 +6,19 @@ import Link from 'next/link';
 import Image from 'next/image';
 import LoginModal from '@/app/components/auth/authInicioSesion/LoginModal';
 import RegisterModal from '@/app/components/auth/authregistro/RegisterModal';
+import PasswordRecoveryModal from '../auth/authRecuperarContrasena/PasswordRecoveryModal';
+import VehicleDataModal from '@/app/components/auth/authRegistroHost/VehicleDataModal';
+import PaymentRegistrationModal from '@/app/components/auth/authRegistroHost/PaymentModal';
+import CompleteProfileModal from '@/app/components/auth/authRegistroHost/CompleteProfileModal';
 import { useUser } from '@/hooks/useUser';
+import CodeVerificationModal from '../auth/authRecuperarContrasena/CodeVerificationModal';
+import NewPasswordModal from '../auth/authRecuperarContrasena/NewPasswordModal';
 
 interface DynamicNavbarProps {
   onBecomeHost?: () => void;
   onBecomeDriver?: () => void;
 }
 
-// Función para validar URLs
 const isValidUrl = (url: string): boolean => {
   try {
     new URL(url);
@@ -23,22 +28,18 @@ const isValidUrl = (url: string): boolean => {
   }
 };
 
-// Función para construir URL de imagen
 const buildImageUrl = (fotoPerfil: string | null | undefined): string | null => {
   if (!fotoPerfil) return null;
-  
-  // Si ya es una URL completa válida, devolverla
+
   if (isValidUrl(fotoPerfil)) {
     return fotoPerfil;
   }
-  
-  // Si es una ruta relativa, construir la URL completa
+
   const baseUrl = 'http://34.69.214.55:3001';
-  const fullUrl = fotoPerfil.startsWith('/') 
-    ? `${baseUrl}${fotoPerfil}` 
+  const fullUrl = fotoPerfil.startsWith('/')
+    ? `${baseUrl}${fotoPerfil}`
     : `${baseUrl}/${fotoPerfil}`;
-  
-  // Validar la URL construida
+
   return isValidUrl(fullUrl) ? fullUrl : null;
 };
 
@@ -46,11 +47,34 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
   const [activeBtn, setActiveBtn] = useState(0);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [showRecuperarPassword, setShowRecuperarPassword] = useState(false);
+  const [showCodeVerification, setShowCodeVerification] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [verificationCode, setVerificationCode] = useState<string>('');
+  const [showVehicleModal, setShowVehicleModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userName, setUserName] = useState<string>('');
-  
+  const [vehicleData, setVehicleData] = useState<{
+    placa: string;
+    soat: string;
+    imagenes: File[];
+    idAuto: number;
+  } | null>(null);
+
+  const [paymentData, setPaymentData] = useState<{
+    tipo: "TARJETA_DEBITO" | "QR" | "EFECTIVO";
+    cardNumber?: string;
+    expiration?: string;
+    cvv?: string;
+    cardHolder?: string;
+    qrImage?: File | null;
+    efectivoDetalle?: string;
+  } | null>(null);
+
   const router = useRouter();
   const user = useUser();
 
@@ -58,11 +82,10 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
     const token = localStorage.getItem('token');
     const nombreCompleto = localStorage.getItem('nombreCompleto');
     const userPicture = localStorage.getItem('userPicture');
-    
+
     setIsLoggedIn(!!token);
     setUserName(nombreCompleto || '');
-    
-    // Priorizar la imagen del localStorage si existe y es válida
+
     if (userPicture) {
       const validUrl = buildImageUrl(userPicture);
       if (validUrl) {
@@ -70,8 +93,7 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
         return;
       }
     }
-    
-    // Si no hay imagen válida en localStorage, usar la del usuario
+
     if (user?.fotoPerfil) {
       const validUrl = buildImageUrl(user.fotoPerfil);
       setProfilePhotoUrl(validUrl);
@@ -99,10 +121,9 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
   }, []);
 
   useEffect(() => {
-    // Solo actualizar si no hay imagen válida en localStorage
     const userPicture = localStorage.getItem('userPicture');
     const hasValidLocalImage = userPicture && buildImageUrl(userPicture);
-    
+
     if (!hasValidLocalImage) {
       if (user?.fotoPerfil) {
         const validUrl = buildImageUrl(user.fotoPerfil);
@@ -115,18 +136,15 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
   }, [user]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('nombreCompleto');
-    localStorage.removeItem('user_email');
-    localStorage.removeItem('userPicture');
-    
+    localStorage.clear();
+
     setIsLoggedIn(false);
     setUserName('');
     setProfilePhotoUrl(null);
     setIsMenuOpen(false);
-    
+
     window.dispatchEvent(new Event('authChange'));
-    
+
     router.push('/');
   };
 
@@ -137,6 +155,87 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
     } else if (index === 1) {
       router.push('/autos');
     }
+  };
+
+  const handleHostRegistration = () => {
+    setIsMenuOpen(false);
+    setShowVehicleModal(true);
+    if (onBecomeHost) {
+      onBecomeHost();
+    }
+  };
+
+  const handlePasswordRecoverySubmit = () => {
+    setShowRecuperarPassword(false);
+    setShowCodeVerification(true);
+  }
+
+  const handleNewPasswordSuccess = () => {
+    setShowNewPassword(false);
+    setVerificationCode('');
+    setShowLogin(true);
+  }
+
+  const handleCodeVerificationSubmit = (code: string) => {
+    setVerificationCode(code);
+    setShowNewPassword(true);
+    setShowCodeVerification(false);
+  }
+
+  const handleUserBlocked = () => {
+    setShowCodeVerification(false);
+  }
+  // Función para manejar los datos del vehículo
+  const handleVehicleDataNext = (data: {
+    placa: string;
+    soat: string;
+    imagenes: File[];
+    idAuto: number;
+  }) => {
+    console.log('Datos del vehículo:', data);
+    setVehicleData(data);
+    setShowVehicleModal(false);
+    setShowPaymentModal(true);
+  };
+
+  // Función para manejar los datos de pago
+  const handlePaymentNext = (data: {
+    tipo: "TARJETA_DEBITO" | "QR" | "EFECTIVO";
+    cardNumber?: string;
+    expiration?: string;
+    cvv?: string;
+    cardHolder?: string;
+    qrImage?: File | null;
+    efectivoDetalle?: string;
+  }) => {
+    console.log('Datos de pago:', data);
+    setPaymentData(data); // Guardar los datos de pago
+    setShowPaymentModal(false);
+    setShowCompleteModal(true); // Mostrar el modal de confirmación
+  };
+
+  // Función para manejar el cierre del modal de pago
+  const handlePaymentClose = async () => {
+    setShowPaymentModal(false);
+    setVehicleData(null);
+    setPaymentData(null);
+  };
+
+  // Función para manejar la finalización del registro
+  const handleCompleteRegistration = () => {
+    setShowCompleteModal(false);
+    setVehicleData(null);
+    setPaymentData(null);
+
+    // Actualizar el estado de autenticación para reflejar los cambios
+    updateAuthState();
+  };
+
+  // Función para manejar el cierre del modal de confirmación
+  const handleCompleteClose = () => {
+    setShowCompleteModal(false);
+    setVehicleData(null);
+    setPaymentData(null);
   };
 
   return (
@@ -150,7 +249,7 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
             </h1>
           </Link>
 
-          {/* Botones de navegación - Siempre visibles */}
+          {/* Botones de navegación */}
           <div className="flex overflow-x-auto md:overflow-visible relative w-full md:w-auto justify-start md:justify-center">
             {['Home', 'Autos', 'Botón3', 'Botón4', 'Botón5'].map((label, i) => (
               <button
@@ -175,13 +274,12 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
             ))}
           </div>
 
-          {/* Sección derecha - Dinámica según estado de autenticación */}
+          {/* Sección derecha */}
           <div className="flex justify-center md:justify-end gap-0 w-full md:w-auto">
             {isLoggedIn ? (
-              /* Usuario logueado - Mostrar perfil */
               <div className="relative z-[1000] flex items-center gap-0 bg-[var(--naranja)] rounded-[20px] shadow-[var(--sombra)] overflow-visible">
-                <button 
-                  onClick={() => setIsMenuOpen(!isMenuOpen)} 
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="flex-1 md:flex-none px-4 md:px-8 py-[0.4rem] font-[var(--tamaña-bold)] text-[var(--blanco)] text-sm md:text-base whitespace-nowrap"
                 >
                   {userName || user?.nombreCompleto || 'Usuario'}
@@ -214,29 +312,28 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
                     </svg>
                   )}
                 </div>
-                
+
                 {/* Menú desplegable del perfil */}
                 {isMenuOpen && (
-                  <ProfileMenu 
-                    onLogout={handleLogout} 
-                    router={router} 
-                    onBecomeHost={onBecomeHost || (() => {})} 
-                    onBecomeDriver={onBecomeDriver || (() => {})}
+                  <ProfileMenu
+                    onLogout={handleLogout}
+                    router={router}
+                    onBecomeHost={handleHostRegistration}
+                    onBecomeDriver={onBecomeDriver || (() => { })}
                     user={user}
                   />
                 )}
               </div>
             ) : (
-              /* Usuario no logueado - Mostrar botones de auth */
               <>
-                <button 
-                  onClick={() => setShowRegister(true)} 
+                <button
+                  onClick={() => setShowRegister(true)}
                   className="cursor-pointer w-1/2 md:w-auto px-4 md:px-8 py-[0.4rem] rounded-l-[20px] bg-[var(--naranja-46)] font-[var(--tamaño-regular)] text-[var(--azul-oscuro)] shadow-[var(--sombra)] text-sm md:text-base"
                 >
                   Registrarse
                 </button>
-                <button 
-                  onClick={() => setShowLogin(true)} 
+                <button
+                  onClick={() => setShowLogin(true)}
                   className="cursor-pointer w-1/2 md:w-auto px-4 py-[0.4rem] rounded-r-[20px] bg-[var(--naranja)] text-[var(--blanco)] font-[var(--tamaña-bold)] shadow-[var(--sombra)] transition-transform duration-100 active:scale-[0.97] active:shadow-[0_1px_3px_rgba(0,0,0,0.2)] text-sm md:text-base"
                 >
                   Iniciar Sesión
@@ -247,7 +344,7 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
         </nav>
       </div>
 
-      {/* Modales de autenticación - Solo se muestran cuando no está logueado */}
+      {/* Modales de autenticación */}
       {!isLoggedIn && showLogin && (
         <LoginModal
           onClose={() => setShowLogin(false)}
@@ -255,10 +352,40 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
             setShowLogin(false);
             setShowRegister(true);
           }}
-          onPasswordRecoveryClick={() => console.log("Recuperar contraseña")}
+          onPasswordRecoveryClick={() => {
+            setShowLogin(false);
+            setShowRecuperarPassword(true);
+          }}
         />
       )}
 
+      {!isLoggedIn && showRecuperarPassword && (
+        <PasswordRecoveryModal
+          onClose={() => setShowRecuperarPassword(false)}
+          onPasswordRecoverySubmit={handlePasswordRecoverySubmit}
+        />
+      )
+      }
+      {!isLoggedIn && showCodeVerification && (
+        <CodeVerificationModal
+          onClose={() => {
+            setShowCodeVerification(false);
+            setShowRecuperarPassword(true);
+          }}
+          onCodeVerificationSubmit={handleCodeVerificationSubmit}
+          onBlocked={handleUserBlocked}
+        />
+      )}
+      {!isLoggedIn && showNewPassword && (
+        <NewPasswordModal
+          code={verificationCode}
+          onClose={() => {
+            setShowNewPassword(false);
+            setVerificationCode('');
+          }}
+          onNewPasswordSubmit={handleNewPasswordSuccess}
+        />
+      )}
       {!isLoggedIn && showRegister && (
         <RegisterModal
           onClose={() => setShowRegister(false)}
@@ -266,6 +393,32 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
             setShowRegister(false);
             setShowLogin(true);
           }}
+        />
+      )}
+
+      {/* Modal de datos del vehículo */}
+      {showVehicleModal && (
+        <VehicleDataModal
+          onNext={handleVehicleDataNext}
+          onClose={() => setShowVehicleModal(false)}
+        />
+      )}
+
+      {/* Modal de registro de pago */}
+      {showPaymentModal && (
+        <PaymentRegistrationModal
+          onNext={handlePaymentNext}
+          onClose={handlePaymentClose}
+        />
+      )}
+
+      {/* Modal de confirmación final */}
+      {showCompleteModal && vehicleData && paymentData && (
+        <CompleteProfileModal
+          onComplete={handleCompleteRegistration}
+          onClose={handleCompleteClose}
+          vehicleData={vehicleData}
+          paymentData={paymentData}
         />
       )}
     </>
@@ -286,7 +439,7 @@ function ProfileMenu({
 }) {
   return (
     <div className="absolute right-0 top-full mt-2 w-40 bg-[var(--blanco)] border rounded-lg shadow-lg z-[9999] font-[var(--tamaña-bold)]">
-      <button 
+      <button
         className="block w-full text-left px-4 py-2 text-[var(--naranja)] hover:bg-[var(--naranja-46)] rounded-t-lg"
         onClick={() => router.push('/home/homePage/userPerfil')}
       >
@@ -294,16 +447,16 @@ function ProfileMenu({
       </button>
 
       {user?.driverBool && (
-        <button 
+        <button
           className="block w-full text-left px-4 py-2 text-[var(--naranja)] hover:bg-[var(--naranja-46)]"
           onClick={() => router.push('/home/homePage/userPerfilDriver')}
         >
           <h2 className="hover:text-[var(--blanco)]">Perfil de Conductor</h2>
         </button>
-      )}  
+      )}
 
       {!user?.host && (
-        <button 
+        <button
           className="block w-full text-left px-4 py-2 text-[var(--naranja)] hover:bg-[var(--naranja-46)]"
           onClick={onBecomeHost}
         >
@@ -312,7 +465,7 @@ function ProfileMenu({
       )}
 
       {!user?.driverBool && (
-        <button 
+        <button
           className="block w-full text-left px-4 py-2 text-[var(--naranja)] hover:bg-[var(--naranja-46)]"
           onClick={() => router.push('/home/Driver')}
         >
@@ -320,7 +473,7 @@ function ProfileMenu({
         </button>
       )}
 
-      <button 
+      <button
         className="block w-full text-left px-4 py-2 text-[var(--naranja)] hover:bg-[var(--naranja-46)] rounded-b-lg"
         onClick={onLogout}
       >

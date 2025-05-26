@@ -1,10 +1,8 @@
 import styles from "./RegisterModal.module.css";
 import { useState } from "react";
-import CompleteProfileModal from "./CompleteProfileModal"; // ajusta si cambia el path
+import CompleteProfileModal from "./CompleteProfileHost";
 import { useEffect } from "react";
 import { BASE_URL } from '@/libs/autoServices';
-/* import { useSearchParams } from "next/navigation"; */ // o useLocation si usas react-router
-/* import { backendip } from "@/libs/authServices"; */
 
 export default function RegisterModal({
   onClose,
@@ -13,36 +11,10 @@ export default function RegisterModal({
   onClose: () => void;
   onLoginClick: () => void;
 }) {
-  const handleGoogleRegister = () => {
-    window.location.href = `${BASE_URL}/auth/google`
-  };
-
-  /* Parte de las const*/
   const [welcome, setWelcome] = useState("");
-
   const [showWelcome, setShowWelcome] = useState(false);
-
   const [loading, setLoading] = useState(false);
-
-  const [nameValue, setNameValue] = useState(
-    localStorage.getItem("register_name") || ""
-  );
-  const [emailValue, setEmailValue] = useState(
-    localStorage.getItem("register_email") || ""
-  );
-  const [passwordValue, setPasswordValue] = useState(
-    localStorage.getItem("register_password") || ""
-  );
-  const [confirmPasswordValue, setConfirmPasswordValue] = useState(
-    localStorage.getItem("register_confirmPassword") || ""
-  );
-
-  const [phoneValue, setPhoneValue] = useState(
-    localStorage.getItem("register_phone") || ""
-  );
-
   const [error, setError] = useState("");
-
   const [nameError, setNameError] = useState(false);
   const [nameMessage, setNameMessage] = useState("");
   const [emailError, setEmailError] = useState(false);
@@ -58,18 +30,29 @@ export default function RegisterModal({
   const [phoneError, setPhoneError] = useState(false);
   const [phoneMessage, setPhoneMessage] = useState("");
   const [termsError, setTermsError] = useState(false);
-
-  /*   const searchParams =
-    typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search)
-      : null; */
-
   const [showCompleteProfile, setShowCompleteProfile] = useState(false);
-  /* const [showCompleteProfileModal, setShowCompleteProfileModal] =
-    useState(false); */
-
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
+  const shouldOpen = localStorage.getItem("openCompleteProfileModal");
+  const params = new URLSearchParams(window.location.search);
+  const googleError = params.get("error");
+  const [nameValue, setNameValue] = useState(
+    localStorage.getItem("register_name") || ""
+  );
+  const [emailValue, setEmailValue] = useState(
+    localStorage.getItem("register_email") || ""
+  );
+  const [passwordValue, setPasswordValue] = useState(
+    localStorage.getItem("register_password") || ""
+  );
+  const [confirmPasswordValue, setConfirmPasswordValue] = useState(
+    localStorage.getItem("register_confirmPassword") || ""
+  );
+  const [phoneValue, setPhoneValue] = useState(
+    localStorage.getItem("register_phone") || ""
+  );
+  const handleGoogleRegister = () => {
+    window.location.href = `${BASE_URL}/auth/google`
+  };
   const getLabelColor = (hasError: boolean) =>
     hasError ? "#E30000" : "var(--azul-oscuro)";
 
@@ -82,15 +65,12 @@ export default function RegisterModal({
     "@icloud.com",
     "@proton.me",
   ];
-
   useEffect(() => {
     const message = localStorage.getItem("welcomeMessage");
     if (message) {
       setWelcome(message);
       setShowWelcome(true);
       localStorage.removeItem("welcomeMessage");
-
-      // Desaparecer después de 3 segundos
       setTimeout(() => {
         setShowWelcome(false);
       }, 3000);
@@ -102,45 +82,34 @@ export default function RegisterModal({
       );
       return;
     }
-
     const googleComplete = window.location.search.includes(
       "googleComplete=true"
     );
-    const shouldOpen = localStorage.getItem("openCompleteProfileModal");
-
-    const params = new URLSearchParams(window.location.search);
-    const googleError = params.get("error");
-
     if (googleComplete && shouldOpen === "true") {
       setShowCompleteProfile(true);
       localStorage.removeItem("openCompleteProfileModal");
     }
 
     if (googleError === "alreadyExists") {
-      // Mostrar el modal manual y algún mensaje
       setError("Esta cuenta ya está registrada. Por favor, inicia sesión.");
-      onClose(); // Cierra modal Google si estuviera abierto
-      setTimeout(() => onLoginClick(), 100); // Abre el login
+      onClose();
+      setTimeout(() => onLoginClick(), 100);
     }
-
     const url = new URL(window.location.href);
     url.searchParams.delete("googleComplete");
     url.searchParams.delete("error");
     window.history.replaceState({}, document.title, url.toString());
   }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
+    setLoading(true);
     const form = e.target as HTMLFormElement;
-
     const name = nameValue.trim();
     const email = emailValue.trim();
     const password = passwordValue.trim();
     const confirmPassword = confirmPasswordValue.trim();
     const phone = phoneValue.trim();
-
     const birthDay = (form.elements.namedItem("birthDay") as HTMLSelectElement)
       .value;
     const birthMonth = (
@@ -149,12 +118,7 @@ export default function RegisterModal({
     const birthYear = (
       form.elements.namedItem("birthYear") as HTMLSelectElement
     ).value;
-
-    //manejo de errores
-
     let hasErrors = false;
-
-    //validaciones de nombre de usuario
     const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ'’\- ]+$/;
 
     if (name.length < 3) {
@@ -175,9 +139,6 @@ export default function RegisterModal({
       setNameError(false);
       setNameMessage("");
     }
-
-    //validaciones de email
-
     const emailDomain = email.slice(email.indexOf("@"));
 
     if (!email.includes("@") || !email.includes(".") || email.length < 5) {
@@ -196,9 +157,6 @@ export default function RegisterModal({
       setEmailError(false);
       setEmailMessage("");
     }
-
-    //validaciones de passwrod
-
     if (password.trim() === "") {
       setPasswordMessage("La contraseña no puede estar vacía");
       setPasswordError(true);
@@ -235,9 +193,6 @@ export default function RegisterModal({
       setPasswordError(false);
       setPasswordMessage("");
     }
-
-    // validacion de Confirmar contraseña
-
     if (confirmPassword.trim() === "") {
       setConfirmPasswordError(true);
       setConfirmPasswordMessage("Debes confirmar la contraseña");
@@ -250,19 +205,15 @@ export default function RegisterModal({
       setConfirmPasswordError(false);
       setConfirmPasswordMessage("");
     }
-
-    /*validacion de fecha*/
     const today = new Date();
     const selectedDate = new Date(
       Number(birthYear),
       Number(birthMonth) - 1,
       Number(birthDay)
     );
-
     const ageDiffMs = today.getTime() - selectedDate.getTime();
     const ageDate = new Date(ageDiffMs);
     const age = Math.abs(ageDate.getUTCFullYear() - 1970);
-
     const invalidBirth =
       !birthDay || !birthMonth || !birthYear || selectedDate > today;
 
@@ -282,8 +233,6 @@ export default function RegisterModal({
       setBirthError(false);
       setBirthMessage("");
     }
-
-    //validacion de telefono
     const cleanPhone = phone.replace(/\D/g, "");
 
     if (!phone) {
@@ -298,7 +247,6 @@ export default function RegisterModal({
       setPhoneMessage("El número debe tener exactamente 8 dígitos");
       hasErrors = true;
     } else {
-      // Si pasa validaciones de formato, ahora verificamos si ya está en uso en BD
       try {
         const phoneCheckResponse = await fetch(
           `${BASE_URL}/check-phone`,
@@ -314,7 +262,7 @@ export default function RegisterModal({
         if (phoneCheckData.exists) {
           setPhoneError(true);
           setPhoneMessage("El número ya está registrado en el sistema.");
-          hasErrors = true; //  Muy importante: detener el submit
+          hasErrors = true;
         } else {
           setPhoneError(false);
           setPhoneMessage("");
@@ -323,8 +271,6 @@ export default function RegisterModal({
         console.error("Error verificando teléfono:", error);
       }
     }
-
-    //validacion de terminos y condiciones
     const terms = (form.elements.namedItem("terms") as HTMLInputElement)
       .checked;
 
@@ -335,9 +281,11 @@ export default function RegisterModal({
       setTermsError(false);
     }
 
-    if (hasErrors) return;
+    if (hasErrors) {
+      setLoading(false);
+      return;
+    }
 
-    /*conexion con back end*/
     try {
       const fechaNacimiento = new Date(
         Number(birthYear),
@@ -360,15 +308,13 @@ export default function RegisterModal({
       });
 
       if (res.ok) {
-        /* alert("¡Usuario registrado con éxito!"); */
-        setShowSuccessModal(true); // ✅ Mostrar el modal
+        setShowSuccessModal(true);
         localStorage.removeItem("register_name");
         localStorage.removeItem("register_email");
         localStorage.removeItem("register_password");
         localStorage.removeItem("register_confirmPassword");
         localStorage.removeItem("register_phone");
         form.reset();
-        /* onClose(); */
       } else {
         const data = await res.json();
         setError(
@@ -378,11 +324,10 @@ export default function RegisterModal({
     } catch (error) {
       console.error(error);
       setError("No se pudo conectar al servidor.");
+    } finally {
+      setLoading(false);
     }
-
-    /* setShowCompleteProfileModal(true); */
   };
-
   return (
     <div className={styles.overlay}>
       {showCompleteProfile && (
@@ -904,12 +849,10 @@ export default function RegisterModal({
               {error && (
                 <p style={{ color: "red", marginBottom: "1rem" }}>{error}</p>
               )}
-
               {/* boton registrarse */}
               <button type="submit" className={styles.button}>
                 Registrarse
               </button>
-
               {/* campo inicio de sesion */}
               <p
                 style={{
@@ -952,9 +895,8 @@ export default function RegisterModal({
             <button
               onClick={() => {
                 setShowSuccessModal(false);
-                onClose(); // Cierra el modal de registro
-                setTimeout(() => onLoginClick(), 100); // Abre login (opcional)
-                /* onClose(); */
+                onClose();
+                setTimeout(() => onLoginClick(), 100);
               }}
               className={styles.successButton}
             >

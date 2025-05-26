@@ -36,7 +36,6 @@ export default function RegistroDriver() {
   const [anverso, setAnverso] = useState<File | null>(null);
   const [reverso, setReverso] = useState<File | null>(null);
   const [perfil, setPerfil] = useState<File | null>(null);
-  const [errorPerfil, setErrorPerfil] = useState<string | null>(null);
   const [nombreUsuario, setNombreUsuario] = useState<string>('');
   const [sexo, setSexo] = useState<string>('');
   const [telefonoUsuario, setTelefonoUsuario] = useState<string>('');
@@ -44,7 +43,6 @@ export default function RegistroDriver() {
   const [categoriaLicencia, setCategoriaLicencia] = useState<string>('');
   const [fechaVencimiento, setFechaVencimiento] = useState<string>('');
   const [fechaEmision, setFechaEmision] = useState<string>('');
-
   const [errorSexo, setErrorSexo] = useState(false);
   const [mensajeErrorSexo, setMensajeErrorSexo] = useState('');
   const [errorTelefono, setErrorTelefono] = useState(false);
@@ -59,15 +57,12 @@ export default function RegistroDriver() {
   const [mensajeErrorFechaVencimiento, setMensajeErrorFechaVencimiento] = useState('');
   const [errorAnverso, setErrorAnverso] = useState<string | null>(null);
   const [errorReverso, setErrorReverso] = useState<string | null>(null);
-
-  const router = useRouter();
-
   const [mensajeErrorAnverso, setMensajeErrorAnverso] = useState('');
   const [mensajeErrorReverso, setMensajeErrorReverso] = useState('');
+  const router = useRouter();
 
   const anversoRef = useRef<HTMLInputElement>(null);
   const reversoRef = useRef<HTMLInputElement>(null);
-  const perfilRef = useRef<HTMLInputElement>(null);
 
   const user = useUser();
 
@@ -83,7 +78,7 @@ export default function RegistroDriver() {
 
   useEffect(() => {
     if (user?.telefono) {
-      setTelefonoUsuario(String(user.telefono)); // fuerza a texto
+      setTelefonoUsuario(String(user.telefono));
     }
   }, [user]);
 
@@ -114,128 +109,79 @@ export default function RegistroDriver() {
     };
   }, []);
 
-  const validateFile = (file: File, tipo: 'anverso' | 'reverso' | 'perfil') => {
-    return new Promise<{ valido: boolean; mensaje?: string }>((resolve) => {
-      const validType = file.type === 'image/png';
-      if (!validType) {
-        resolve({ valido: false, mensaje: 'Solo se permiten imágenes en formato PNG.' });
+  const validateFile = async (file: File): Promise<{ valido: boolean; mensaje?: string }> => {
+    return new Promise((resolve) => {
+      if (file.type !== 'image/png') {
+        resolve({ valido: false, mensaje: 'Solo se permiten imágenes en formato PNG' });
         return;
       }
-
-      const img = new Image();
+  
+      const maxSize = 5 * 1024 * 1024;
+      if (file.size > maxSize) {
+        resolve({ valido: false, mensaje: 'La imagen no debe superar los 5MB' });
+        return;
+      }
+  
+      const img = new window.Image();
       img.onload = () => {
         if (img.width < 500 || img.height < 500) {
-          resolve({ valido: false, mensaje: 'La imagen es ilegible. Por favor, envíe una foto clara de su licencia.' });
+          resolve({ valido: false, mensaje: 'La imagen es ilegible. Por favor, sube una imagen de al menos 500x500 píxeles.' });
         } else {
           resolve({ valido: true });
         }
       };
       img.onerror = () => {
-        resolve({ valido: false, mensaje: 'No se pudo cargar la imagen.' });
+        resolve({ valido: false, mensaje: 'No se pudo leer la imagen. Intenta con otra.' });
       };
-
       img.src = URL.createObjectURL(file);
     });
   };
-
-  const handleFileChange = (
+  
+  const handleFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
     tipo: 'anverso' | 'reverso' | 'perfil'
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validación si ya hay una imagen en ese campo
-    if (tipo === 'anverso' && anverso) {
-      setErrorAnverso('Ya se ha cargado una imagen. Elimina la actual para subir otra.');
+      
+    if (
+      (tipo === 'anverso' && anverso) ||
+      (tipo === 'reverso' && reverso) ||
+      (tipo === 'perfil' && perfil)
+    ) {
+      const errorMsg = 'Ya se ha cargado una imagen. Elimina la actual para subir otra.';
+      if (tipo === 'anverso') setErrorAnverso(errorMsg);
+      if (tipo === 'reverso') setErrorReverso(errorMsg);
+      if (tipo === 'perfil') setPerfil(null);
       return;
     }
-    if (tipo === 'reverso' && reverso) {
-      setErrorReverso('Ya se ha cargado una imagen. Elimina la actual para subir otra.');
-      return;
-    }
-    if (tipo === 'perfil' && perfil) {
-      setErrorPerfil('Ya se ha cargado una imagen. Elimina la actual para subir otra.');
-      return;
-    }
-
-    // Validación formato de imagen
-    if (file.type !== 'image/png') {
-      const errorMsg = 'Solo se permiten imágenes en formato PNG';
+  
+    const { valido, mensaje } = await validateFile(file);
+  
+    if (!valido) {
       if (tipo === 'anverso') {
-        setErrorAnverso(errorMsg);
+        setErrorAnverso(mensaje || 'Error desconocido');
+        setMensajeErrorAnverso(mensaje || 'Error desconocido');
         setAnverso(null);
       } else if (tipo === 'reverso') {
-        setErrorReverso(errorMsg);
+        setErrorReverso(mensaje || 'Error desconocido');
+        setMensajeErrorReverso(mensaje || 'Error desconocido');
         setReverso(null);
-      } else if (tipo === 'perfil') {
-        setErrorPerfil(errorMsg);
-        setPerfil(null);
       }
       return;
     }
-
-    // Validación de tamaño
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      const errorMsg = 'La imagen no debe superar los 5MB';
-      if (tipo === 'anverso') {
-        setErrorAnverso(errorMsg);
-        setAnverso(null);
-      } else if (tipo === 'reverso') {
-        setErrorReverso(errorMsg);
-        setReverso(null);
-      } else if (tipo === 'perfil') {
-        setErrorPerfil(errorMsg);
-        setPerfil(null);
-      }
-      return;
+  
+    if (tipo === 'anverso') {
+      setErrorAnverso(null);
+      setMensajeErrorAnverso('');
+      setAnverso(file);
+    } else if (tipo === 'reverso') {
+      setErrorReverso(null);
+      setMensajeErrorReverso('');
+      setReverso(file);
+    } else if (tipo === 'perfil') {
+      setPerfil(file);
     }
-
-    // Validación de resolución
-    const img = new Image();
-    img.onload = () => {
-      if (img.width < 500 || img.height < 500) {
-        const errorMsg = 'La imagen es ilegible. Por favor, sube una imagen de al menos 500x500 píxeles.';
-        if (tipo === 'anverso') {
-          setErrorAnverso(errorMsg);
-          setAnverso(null);
-        } else if (tipo === 'reverso') {
-          setErrorReverso(errorMsg);
-          setReverso(null);
-        } else if (tipo === 'perfil') {
-          setErrorPerfil(errorMsg);
-          setPerfil(null);
-        }
-      } else {
-        if (tipo === 'anverso') {
-          setAnverso(file);
-          setErrorAnverso(null);
-        } else if (tipo === 'reverso') {
-          setReverso(file);
-          setErrorReverso(null);
-        } else if (tipo === 'perfil') {
-          setPerfil(file);
-          setErrorPerfil(null);
-        }
-      }
-    };
-
-    img.onerror = () => {
-      const errorMsg = 'No se pudo leer la imagen. Intenta con otra.';
-      if (tipo === 'anverso') {
-        setErrorAnverso(errorMsg);
-        setAnverso(null);
-      } else if (tipo === 'reverso') {
-        setErrorReverso(errorMsg);
-        setReverso(null);
-      } else if (tipo === 'perfil') {
-        setErrorPerfil(errorMsg);
-        setPerfil(null);
-      }
-    };
-
-    img.src = URL.createObjectURL(file);
   };
 
   const removeFile = (tipo: 'anverso' | 'reverso' | 'perfil') => {
@@ -263,11 +209,6 @@ export default function RegistroDriver() {
         </button>
       </div>
     );
-  };
-
-  const validarTelefono = (telefono: string): boolean => {
-    const regex = /^[67]\d{7}$/;
-    return regex.test(telefono);
   };
 
   const validarNroLicencia = (nroLicencia: string): boolean => {
@@ -701,8 +642,6 @@ export default function RegistroDriver() {
               )}
             </div>
 
-
-
             {/* Última fila */}
             <div className="flex w-full mt-4 gap-4">
               {/* Fecha de emisión */}
@@ -756,8 +695,6 @@ export default function RegistroDriver() {
                   Fecha de emisión
                 </span>
               </div>
-
-
 
               {/* Fecha de vencimiento */}
               <div className="w-1/2 relative">
@@ -932,9 +869,6 @@ export default function RegistroDriver() {
 
 
             <div className="flex justify-end mt-1 pr-6">
-
-
-
               <div className="flex justify-end gap-8 mt-1 px-6">
                 <button
                   onClick={() => {

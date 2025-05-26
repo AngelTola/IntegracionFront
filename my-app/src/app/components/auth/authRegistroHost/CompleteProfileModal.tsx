@@ -54,7 +54,7 @@ const CompleteProfileModal: React.FC<Props> = ({
 
       // Método de pago
       if (paymentData.cardNumber) {
-        formData.append("tipo", "card");
+        formData.append("tipo", "TARJETA_DEBITO");
         
         // Elimina espacios en blanco y formatea el número de tarjeta
         const cleanCardNumber = paymentData.cardNumber.replace(/\s/g, "");
@@ -76,16 +76,16 @@ const CompleteProfileModal: React.FC<Props> = ({
           formData.append("titular", paymentData.cardHolder);
         }
       } else if (paymentData.qrImage) {
-        formData.append("tipo", "qr");
+        formData.append("tipo", "QR");
         formData.append("qrImage", paymentData.qrImage);
       } else if (paymentData.efectivoDetalle) {
-        formData.append("tipo", "cash");
+        formData.append("tipo", "EFECTIVO");
         formData.append("detalles_metodo", paymentData.efectivoDetalle);
       }
 
       // Para debugging - ver qué datos estamos enviando
       console.log("Enviando datos de pago:", {
-        tipo: paymentData.cardNumber ? "card" : paymentData.qrImage ? "qr" : "cash",
+        tipo: paymentData.cardNumber ? "TARJETA_DEBITO" : paymentData.qrImage ? "QR" : "EFECTIVO",
         ...(paymentData.cardNumber && {
           numero_tarjeta: paymentData.cardNumber.replace(/\s/g, ""),
           fecha_expiracion: paymentData.expiration,
@@ -113,11 +113,10 @@ const CompleteProfileModal: React.FC<Props> = ({
         localStorage.setItem("registroExitosoHost", "true");
 
         setTimeout(() => {
-          // 👇 Recarga solo si estás en homePage
-          if (window.location.pathname.includes("/home/homePage")) {
+          if (window.location.pathname.includes("/home")) {
             window.location.reload();
           } else {
-            onComplete(); // fallback por si estás en otra ruta
+            onComplete(); 
           }
         }, 2000);
       }

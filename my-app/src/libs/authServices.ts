@@ -1,7 +1,9 @@
 // src/libs/authService.ts
 
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"
+
 export async function login(email: string, password: string) {
-  const res = await fetch("http://localhost:3001/api/login", {
+  const res = await fetch(`${BASE_URL}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -51,10 +51,7 @@ const CodeVerificationModal = ({
         setErrorMessage('Has sido bloqueado temporalmente. Intenta nuevamente más tarde.');
         onBlocked?.();
       } else {
-        // Handle other errors
-        //alert(`Error: ${data.message || 'Unknown error occurred.'}`);
         setErrorMessage(data.message || 'Codigo incorrecto. Por favor intenta nuevamente.');
-
       }
       return;
     }

@@ -1,5 +1,6 @@
 // libs/userService.ts
 import { BASE_URL } from "@/libs/autoServices";
+
 export const updateUserField = async (campo: string, valor: string) => {
     const token = localStorage.getItem("token");
   
@@ -7,7 +8,7 @@ export const updateUserField = async (campo: string, valor: string) => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // asegúrate que sea Bearer
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ campo, valor }),
     });

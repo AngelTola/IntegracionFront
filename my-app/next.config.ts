@@ -15,6 +15,11 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+    domains: [
+      'localhost',
+      'res.cloudinary.com',
+      // otros dominios que necesites
+    ]
   },
 }
 module.exports = nextConfig

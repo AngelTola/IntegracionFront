@@ -6,14 +6,12 @@ import { BASE_URL } from '@/libs/autoServices';
 
 const NewPasswordModal = ({
   code,
-  //onPasswordResetSuccess,
-  onClose, // Agregamos una función para cerrar el modal
+  onClose,
   onNewPasswordSubmit
 }: {
   code: string;
-  //onPasswordResetSuccess: () => void;
-  onClose: () => void; // Nueva prop para manejar el cierre del modal
-  onNewPasswordSubmit: (newPassword: string) => void; // Nueva prop para manejar el envío de la nueva contraseña
+  onClose: () => void;
+  onNewPasswordSubmit: (newPassword: string) => void;
 }) => {
   console.log('🧠 Código recibido en NewPasswordModal:', code);
   const [newPassword, setNewPassword] = useState('');
@@ -57,18 +55,12 @@ const NewPasswordModal = ({
       setError("No puede tener más de 25 caracteres");
       return false;
     }
-    setError(""); // Limpia el error si todo es válido
+    setError("");
     return true;
   };
 
   const handleConfirm = async () => {
     setError('');
-
-    
-    /*if (!code || code.length !== 6) {
-      setError('Código no válido. Intenta nuevamente.');
-      return;
-    }*/
 
     if (!newPassword || !confirmPassword) {
       setError('Por favor completa ambos campos.');
@@ -86,13 +78,11 @@ const NewPasswordModal = ({
 
     setSuccessMessage('Contraseña actualizada con éxito!');
     setTimeout(() => {
-      setSuccessMessage(''); // Ocultar el pop-up después de 2 segundos
+      setSuccessMessage('');
     }, 2000);
 
     try {
       console.log('📤 Enviando al backend:', {newPassword });
-      //console.log('📦 Código recibido en NewPasswordModal:', code);
-
       const response = await fetch(`${BASE_URL}/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -105,9 +95,7 @@ const NewPasswordModal = ({
         throw new Error(data.message || 'Error al actualizar la contraseña');
       }
 
-      //alert('¡Contraseña actualizada correctamente!');
-      onNewPasswordSubmit(newPassword); // Llama a la función para manejar el envío de la nueva contraseña
-      //onPasswordResetSuccess();
+      onNewPasswordSubmit(newPassword);
     } catch (err) {
       console.error(err);
       if (err instanceof Error) {
@@ -131,14 +119,14 @@ const NewPasswordModal = ({
 
   const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).classList.contains('modal-overlay')) {
-      onClose(); // Llama a la función para cerrar el modal
+      onClose();
     }
   };
 
   return (
     <div
       className="fixed w-full h-full flex justify-center items-center z-[9999] left-0 top-0 bg-black/50 font-sans modal-overlay"
-      onClick={handleOutsideClick} // Detecta clics fuera del modal
+      onClick={handleOutsideClick}
     >
       <div className="w-[33rem] h-auto bg-white p-10 rounded-[35px] shadow-[0_0px_20px_rgba(0,0,0,0.72)]">
         <h1 className="text-center text-[#11295B] text-[1.44rem] font-medium leading-normal mb-4 drop-shadow-md">
@@ -175,10 +163,12 @@ const NewPasswordModal = ({
           <button
             type="button"
             className="absolute right-3 top-1/2 transform -translate-y-1/2 w-6 h-6 text-[#11295B]"
-            onClick={() => setShowPassword(!showPassword)}  // Cambia el estado de visibilidad
+            onClick={() => setShowPassword(!showPassword)}
             disabled={!setNewPassword}
           >
             <Image 
+              width={200}
+              height={200}
               src="https://www.svgrepo.com/download/526542/eye.svg"
               alt="Mostrar contraseña"
               className="w-6 h-6"
@@ -215,6 +205,8 @@ const NewPasswordModal = ({
             disabled={!confirmPassword}
           >
             <Image
+              width={200}
+              height={200}
               src="https://www.svgrepo.com/download/526542/eye.svg"
               alt="Mostrar contraseña"
               className="w-6 h-6"
@@ -238,7 +230,7 @@ const NewPasswordModal = ({
 
         <button
           className="w-full text-[#11295B] underline cursor-pointer my-4 hover:text-[#11295B] transition-colors"
-          onClick={onClose} // Llama a la función para cerrar el modal
+          onClick={onClose}
         >
           Cancelar
         </button>

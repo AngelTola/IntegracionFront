@@ -51,7 +51,7 @@ export default function RegisterModal({
     localStorage.getItem("register_phone") || ""
   );
   const handleGoogleRegister = () => {
-    window.location.href = `${BASE_URL}/auth/google`
+    window.location.href = `${BASE_URL}/api/auth/google`
   };
   const getLabelColor = (hasError: boolean) =>
     hasError ? "#E30000" : "var(--azul-oscuro)";
@@ -99,7 +99,8 @@ export default function RegisterModal({
     url.searchParams.delete("googleComplete");
     url.searchParams.delete("error");
     window.history.replaceState({}, document.title, url.toString());
-  }, []);
+  }, [googleError, onClose, onLoginClick, shouldOpen]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -249,7 +250,7 @@ export default function RegisterModal({
     } else {
       try {
         const phoneCheckResponse = await fetch(
-          `${BASE_URL}/check-phone`,
+          `${BASE_URL}/api/check-phone`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -301,7 +302,7 @@ export default function RegisterModal({
         telefono: phone ? cleanPhone : null,
       };
 
-      const res = await fetch(`${BASE_URL}/register`, {
+      const res = await fetch(`${BASE_URL}/api/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(user),

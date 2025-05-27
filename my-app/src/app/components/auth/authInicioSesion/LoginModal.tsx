@@ -32,7 +32,7 @@ export default function LoginModal({ onClose, onRegisterClick, onPasswordRecover
   const handleGoogleSignIn = async () => {
     try {
       // Redirigir directamente a tu endpoint de Google OAuth
-      window.location.href = `${BASE_URL}/auth/google`;
+      window.location.href = `${BASE_URL}/api/auth/google`;
     } catch (error) {
       console.error('Error al iniciar sesión con Google:', error);
       setError('Error al conectar con Google.');

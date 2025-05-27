@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BASE_URL } from "@/libs/autoServices";
 
 interface User {
   idUsuario: number;
@@ -24,7 +25,7 @@ export const useUser = () => {
       if (!token) return;
 
       try {
-        const res = await fetch('http://localhost:3001/api/me', {
+        const res = await fetch(`${BASE_URL}/api/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

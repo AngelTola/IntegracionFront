@@ -1,21 +1,21 @@
 import type { Auto, Comentario } from "@/types/auto"
 
-export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"
+export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 
 export async function getAutos(): Promise<{ data: Auto[] }> {
-  const res = await fetch(`${BASE_URL}/autos`, { cache: "no-store" })
+  const res = await fetch(`${BASE_URL}/api/autos`, { cache: "no-store" })
   if (!res.ok) throw new Error("Error al obtener autos")
   return res.json()
 }
 
 export async function getAutoPorId(id: string): Promise<{ data: Auto }> {
-  const res = await fetch(`${BASE_URL}/autos/${id}`, { cache: "no-store" })
+  const res = await fetch(`${BASE_URL}/api/autos/${id}`, { cache: "no-store" })
   if (!res.ok) throw new Error("Auto no encontrado")
   return res.json()
 }
 
 export async function getComentariosDeAuto(autoId: number): Promise<{ data: Comentario[] }> {
-  const res = await fetch(`${BASE_URL}/autos/${autoId}/comentarios`, { cache: "no-store" })
+  const res = await fetch(`${BASE_URL}/api/autos/${autoId}/comentarios`, { cache: "no-store" })
   if (!res.ok) throw new Error("No se pudieron cargar los comentarios")
   return res.json()
 }
@@ -27,7 +27,7 @@ export async function getAutosDisponiblesPorFecha(fechaInicio: string, fechaFin:
 
     console.log(`Consultando autos disponibles entre ${inicio} y ${fin}`)
 
-    const res = await fetch(`${BASE_URL}/autosDisponibles/${inicio}/${fin}`, {
+    const res = await fetch(`${BASE_URL}/api/autosDisponibles/${inicio}/${fin}`, {
       cache: "no-store",
     })
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/useUser';
 import { useSearchParams } from "next/navigation";
@@ -9,7 +9,28 @@ import PaymentModal from '@/app/components/auth/authRegistroHost/PaymentModal';
 import CompleteProfileModal from '@/app/components/auth/authRegistroHost/CompleteProfileModal';
 import { BASE_URL } from '@/libs/autoServices';
 
-export default function MainHome() {
+// Separate component that uses useSearchParams
+function SearchParamsHandler({ 
+  setShowSuccessModal 
+}: { 
+  setShowSuccessModal: (show: boolean) => void 
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const registroExitoso = searchParams.get("registroExitoso");
+    if (registroExitoso === "1") {
+      setShowSuccessModal(true);
+
+      const newUrl = window.location.pathname;
+      window.history.replaceState(null, "", newUrl);
+    }
+  }, [searchParams, setShowSuccessModal]);
+
+  return null;
+}
+
+function MainHomeContent() {
   const [activeModal, setActiveModal] = useState<'login' | 'register' | 'vehicleData' | 'paymentData' | 'completeProfile' | 'succesModal' | null>(null);
 
   const [vehicleData, setVehicleData] = useState<{
@@ -31,11 +52,12 @@ export default function MainHome() {
 
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const router = useRouter();
   const user = useUser();
 
-   useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       router.push('/');
@@ -59,39 +81,29 @@ export default function MainHome() {
   };
 
   const handlePaymentDataSubmit = (data: {
-  tipo: "TARJETA_DEBITO" | "QR" | "EFECTIVO";
-  cardNumber?: string;
-  expiration?: string;
-  cvv?: string;
-  cardHolder?: string;
-  qrImage?: File | null;
-  efectivoDetalle?: string;
-}) => {
-  setPaymentData(data);
-  setActiveModal('completeProfile');
-};
+    tipo: "TARJETA_DEBITO" | "QR" | "EFECTIVO";
+    cardNumber?: string;
+    expiration?: string;
+    cvv?: string;
+    cardHolder?: string;
+    qrImage?: File | null;
+    efectivoDetalle?: string;
+  }) => {
+    setPaymentData(data);
+    setActiveModal('completeProfile');
+  };
 
   const handleRegistrationComplete = () => {
     setActiveModal(null);
     displayToast('¡Tu registro como host fue completado exitosamente!');
   };
 
-  const searchParams = useSearchParams();
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-  useEffect(() => {
-    const registroExitoso = searchParams.get("registroExitoso");
-    if (registroExitoso === "1") {
-      setShowSuccessModal(true);
-
-      const newUrl = window.location.pathname;
-      window.history.replaceState(null, "", newUrl);
-    }
-  }, [searchParams]);
-
-  
   return (
     <div className="flex flex-col min-h-screen bg-[var(--background-principal)]">
+      {/* Wrap SearchParamsHandler in Suspense */}
+      <Suspense fallback={null}>
+        <SearchParamsHandler setShowSuccessModal={setShowSuccessModal} />
+      </Suspense>
 
       {activeModal === 'vehicleData' && (
         <VehicleDataModal
@@ -106,7 +118,7 @@ export default function MainHome() {
           onClose={async () => {
             if (vehicleData?.idAuto) {
               const token = localStorage.getItem("token");
-              await fetch(`${BASE_URL}/vehiculos/eliminar-vehiculo/${vehicleData.idAuto}`, {
+              await fetch(`${BASE_URL}/api/vehiculos/eliminar-vehiculo/${vehicleData.idAuto}`, {
                 method: "DELETE",
                 headers: { Authorization: `Bearer ${token}` },
               });
@@ -134,13 +146,12 @@ export default function MainHome() {
       {showSuccessModal && (
         <div
           className="fixed inset-0 bg-[rgba(0,0,0,0.2)] flex items-center justify-center z-50"
-          onClick={() => setShowSuccessModal(false)} // cerrar al hacer clic afuera
+          onClick={() => setShowSuccessModal(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             className="bg-white w-[90%] max-w-md rounded-2xl shadow-lg px-8 py-6 text-center relative"
           >
-            {/* Botón de cerrar (X) */}
             <button
               onClick={() => setShowSuccessModal(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl font-bold"
@@ -148,7 +159,6 @@ export default function MainHome() {
               &times;
             </button>
 
-            {/* Icono de check */}
             <div className="flex justify-center items-center mb-4">
               <div className="bg-green-100 rounded-full p-3">
                 <svg
@@ -163,12 +173,19 @@ export default function MainHome() {
               </div>
             </div>
 
-            {/* Mensaje de éxito */}
             <h2 className="text-xl font-bold text-green-600 mb-1">¡Registro completado!</h2>
             <p className="text-gray-700">Tu registro como driver se completó exitosamente.</p>
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+export default function MainHome() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <MainHomeContent />
+    </Suspense>
   );
 }

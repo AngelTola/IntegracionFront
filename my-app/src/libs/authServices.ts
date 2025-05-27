@@ -1,9 +1,8 @@
 // src/libs/authService.ts
-
-export const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"
+import { BASE_URL } from "@/libs/autoServices";
 
 export async function login(email: string, password: string) {
-  const res = await fetch(`${BASE_URL}/login`, {
+  const res = await fetch(`${BASE_URL}/api/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -21,5 +20,5 @@ export async function login(email: string, password: string) {
 }
 
 export const backendip = () => {
-  return "http://34.69.214.55:3001";
+  return BASE_URL;
 };

@@ -10,6 +10,7 @@ import CalendarIcon from "@/app/components/Icons/Calendar";
 import { SolarGalleryOutline } from "@/app/components/Icons/Gallery";
 import { useUser } from '@/hooks/useUser';
 import Image from "next/image"
+import { BASE_URL } from "@/libs/autoServices";
 
 // Tipo para los datos del driver
 type DriverData = {
@@ -47,7 +48,7 @@ export default function UserPerfilDriver() {
           return;
         }
 
-        const res = await fetch("http://localhost:3001/api/profile", {
+        const res = await fetch(`${BASE_URL}/api/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -77,8 +78,7 @@ export default function UserPerfilDriver() {
 
   useEffect(() => {
     if (user?.fotoPerfil) {
-      setImagePreviewUrl(`http://localhost:3001${user.fotoPerfil}`);
-      console.log('✅ Foto cargada:', `http://localhost:3001${user.fotoPerfil}`);
+      setImagePreviewUrl(`${BASE_URL}${user.fotoPerfil}`);
     }
   }, [user]);
   if (!user) return null;

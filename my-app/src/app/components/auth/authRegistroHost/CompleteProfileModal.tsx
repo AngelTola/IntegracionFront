@@ -93,7 +93,7 @@ const CompleteProfileModal: React.FC<Props> = ({
         })
       });
 
-      const response = await fetch(`${BASE_URL}/registro-host`, {
+      const response = await fetch(`${BASE_URL}/api/registro-host`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

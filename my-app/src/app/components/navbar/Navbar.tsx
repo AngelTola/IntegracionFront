@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback  } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -13,6 +13,7 @@ import CompleteProfileModal from '@/app/components/auth/authRegistroHost/Complet
 import { useUser } from '@/hooks/useUser';
 import CodeVerificationModal from '../auth/authRecuperarContrasena/CodeVerificationModal';
 import NewPasswordModal from '../auth/authRecuperarContrasena/NewPasswordModal';
+import { BASE_URL } from "@/libs/autoServices";
 
 interface DynamicNavbarProps {
   onBecomeHost?: () => void;
@@ -35,10 +36,9 @@ const buildImageUrl = (fotoPerfil: string | null | undefined): string | null => 
     return fotoPerfil;
   }
 
-  const baseUrl = 'http://34.69.214.55:3001';
   const fullUrl = fotoPerfil.startsWith('/')
-    ? `${baseUrl}${fotoPerfil}`
-    : `${baseUrl}/${fotoPerfil}`;
+    ? `${BASE_URL}${fotoPerfil}`
+    : `${BASE_URL}/${fotoPerfil}`;
 
   return isValidUrl(fullUrl) ? fullUrl : null;
 };
@@ -78,14 +78,14 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
   const router = useRouter();
   const user = useUser();
 
-  const updateAuthState = () => {
+  const updateAuthState = useCallback(() => {
     const token = localStorage.getItem('token');
     const nombreCompleto = localStorage.getItem('nombreCompleto');
     const userPicture = localStorage.getItem('userPicture');
-
+  
     setIsLoggedIn(!!token);
     setUserName(nombreCompleto || '');
-
+  
     if (userPicture) {
       const validUrl = buildImageUrl(userPicture);
       if (validUrl) {
@@ -93,18 +93,18 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
         return;
       }
     }
-
+  
     if (user?.fotoPerfil) {
       const validUrl = buildImageUrl(user.fotoPerfil);
       setProfilePhotoUrl(validUrl);
     } else {
       setProfilePhotoUrl(null);
     }
-  };
+  }, [user?.fotoPerfil]);
 
   useEffect(() => {
     updateAuthState();
-  }, []);
+  }, [updateAuthState]);
 
   useEffect(() => {
     const handleAuthChange = () => {
@@ -118,7 +118,7 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
       window.removeEventListener('authChange', handleAuthChange);
       window.removeEventListener('storage', handleAuthChange);
     };
-  }, []);
+  }, [updateAuthState]);
 
   useEffect(() => {
     const userPicture = localStorage.getItem('userPicture');

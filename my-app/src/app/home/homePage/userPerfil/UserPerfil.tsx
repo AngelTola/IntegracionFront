@@ -23,7 +23,6 @@ export default function UserPerfilPage() {
   useEffect(() => {
     if (user?.fotoPerfil) {
       setImagePreviewUrl(user.fotoPerfil);
-      console.log('✅ Foto cargada:', `http://localhost:3001${user.fotoPerfil}`);
     }
   }, [user]);
   

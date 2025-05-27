@@ -46,7 +46,7 @@ const PasswordRecoveryModal = ({
     }
 
     try {
-      const response = await fetch(`${BASE_URL}/recover-password`, {
+      const response = await fetch(`${BASE_URL}/api/recover-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

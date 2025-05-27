@@ -36,25 +36,25 @@ export default function PaymentRegistrationModal({ onClose, onNext }: Props) {
     if (selectedOption === "TARJETA_DEBITO" && touched.cardNumber) {
       validateCardNumber(cardNumber);
     }
-  }, [cardNumber, touched.cardNumber]);
+  }, [cardNumber, touched.cardNumber, selectedOption]);
 
   useEffect(() => {
     if (selectedOption === "TARJETA_DEBITO" && touched.expiryDate) {
       validateExpiryDate(expiryDate);
     }
-  }, [expiryDate, touched.expiryDate]);
+  }, [expiryDate, touched.expiryDate, selectedOption]);
 
   useEffect(() => {
     if (selectedOption === "TARJETA_DEBITO" && touched.cvv) {
       validateCVV(cvv);
     }
-  }, [cvv, touched.cvv]);
+  }, [cvv, touched.cvv, selectedOption]);
 
   useEffect(() => {
     if (selectedOption === "TARJETA_DEBITO" && touched.cardHolder) {
       validateCardHolder(cardHolder);
     }
-  }, [cardHolder, touched.cardHolder]);
+  }, [cardHolder, touched.cardHolder, selectedOption]);
 
   // Funciones de validación individuales
   const validateCardNumber = (value: string) => {

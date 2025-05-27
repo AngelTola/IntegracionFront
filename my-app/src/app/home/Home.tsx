@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import PasswordRecoveryModal from '../components/auth/authRecuperarContrasena/PasswordRecoveryModal';
 import CodeVerificationModal from '../components/auth/authRecuperarContrasena/CodeVerificationModal';
@@ -10,47 +10,21 @@ import ModalLoginExitoso from '@/app/components/modals/ModalLoginExitoso';
 import CompleteProfileModal from '@/app/components/auth/authregistro/CompleteProfileHost';
 import { jwtDecode } from 'jwt-decode';
 
-export default function HomePage() {
+// Componente separado que maneja useSearchParams
+function SearchParamsHandler({
+  setActiveModal,
+  setShowCompleteProfileModal
+}: {
+  setActiveModal: (modal: 'login' | 'register' | null) => void;
+  setShowCompleteProfileModal: (show: boolean) => void;
+}) {
   const searchParams = useSearchParams();
-
-  const [activeModal, setActiveModal] = useState<'login' | 'register' | null>(null);
-  const [modalState, setModalState] = useState<'passwordRecovery' | 'codeVerification' | 'newPassword' | null>(null);
-
-  const [showToast, setShowToast] = useState(false);
-  const [showToast2, setShowToast2] = useState(false);
-  const [showCompleteProfileModal, setShowCompleteProfileModal] = useState(false);
-
-  const handleLoginSubmit = () => setModalState('passwordRecovery');
-  const handlePasswordRecoverySubmit = () => setModalState('codeVerification');
-  const handleCodeVerificationSubmit = () => setModalState('newPassword');
-  const handleClose = () => {
-    setModalState(null);
-    setActiveModal('login');
-  };
-  const handleBackToPasswordRecovery = () => setModalState('passwordRecovery');
 
   useEffect(() => {
     if (searchParams?.get('googleComplete') === 'true') {
       setActiveModal('register');
     }
-  }, [searchParams]);
-
-  const [showLoginSuccessModal, setShowLoginSuccessModal] = useState(false);
-
-  useEffect(() => {
-    const registroDriver = localStorage.getItem('registroDriver');
-    if(registroDriver === '1'){
-      localStorage.removeItem('registroDriver');
-      window.location.reload();
-    }
-  });
-  useEffect(() => {
-    const loginSuccess = localStorage.getItem('loginSuccess');
-    if (loginSuccess === 'true') {
-      setShowLoginSuccessModal(true);
-      localStorage.removeItem('loginSuccess');
-    }
-  }, []);
+  }, [searchParams, setActiveModal]);
 
   useEffect(() => {
     const token = searchParams.get('token');
@@ -84,10 +58,57 @@ export default function HomePage() {
         console.error('Error al decodificar el token:', error);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, setShowCompleteProfileModal]);
+
+  return null;
+}
+
+// Componente principal del contenido
+function HomePageContent() {
+  const [activeModal, setActiveModal] = useState<'login' | 'register' | null>(null);
+  const [modalState, setModalState] = useState<'passwordRecovery' | 'codeVerification' | 'newPassword' | null>(null);
+
+  const [showToast, setShowToast] = useState(false);
+  const [showToast2, setShowToast2] = useState(false);
+  const [showCompleteProfileModal, setShowCompleteProfileModal] = useState(false);
+
+  const handleLoginSubmit = () => setModalState('passwordRecovery');
+  const handlePasswordRecoverySubmit = () => setModalState('codeVerification');
+  const handleCodeVerificationSubmit = () => setModalState('newPassword');
+  const handleClose = () => {
+    setModalState(null);
+    setActiveModal('login');
+  };
+  const handleBackToPasswordRecovery = () => setModalState('passwordRecovery');
+
+  const [showLoginSuccessModal, setShowLoginSuccessModal] = useState(false);
+
+  useEffect(() => {
+    const registroDriver = localStorage.getItem('registroDriver');
+    if(registroDriver === '1'){
+      localStorage.removeItem('registroDriver');
+      window.location.reload();
+    }
+  });
+
+  useEffect(() => {
+    const loginSuccess = localStorage.getItem('loginSuccess');
+    if (loginSuccess === 'true') {
+      setShowLoginSuccessModal(true);
+      localStorage.removeItem('loginSuccess');
+    }
+  }, []);
 
   return (
     <>
+      {/* Envolver SearchParamsHandler en Suspense */}
+      <Suspense fallback={null}>
+        <SearchParamsHandler 
+          setActiveModal={setActiveModal}
+          setShowCompleteProfileModal={setShowCompleteProfileModal}
+        />
+      </Suspense>
+
       {modalState === 'passwordRecovery' && (
         <PasswordRecoveryModal
           onClose={handleClose}
@@ -159,5 +180,13 @@ export default function HomePage() {
         />
       )}
     </>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <HomePageContent />
+    </Suspense>
   );
 }

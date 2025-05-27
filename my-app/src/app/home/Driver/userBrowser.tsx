@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { debounce } from "lodash";
 import { FiMail, FiPhone, FiSearch, FiPlusCircle, FiX } from "react-icons/fi";
 import { useRouter } from "next/navigation";
@@ -30,7 +30,7 @@ const UserBrowser = () => {
       console.warn("⚠️ No se encontraron datos del paso 1 en localStorage");
     }
   
-    fetch(`${BASE_URL}/usuarios/renters`)
+    fetch(`${BASE_URL}/api/usuarios/renters`)
       .then((res) => res.json())
       .then((data) => setAllUsers(data))
       .catch((err) => console.error("Error al obtener renters:", err))
@@ -48,9 +48,9 @@ const UserBrowser = () => {
     localStorage.setItem("selectedRenters", JSON.stringify(selectedUsers));
   }, [selectedUsers]);
 
-  const debouncedSearch = useCallback(
-    debounce((query) => setSearchQuery(query), 300),
-    []
+  const debouncedSearch = useMemo(
+    () => debounce((query: string) => setSearchQuery(query), 300),
+    [setSearchQuery]
   );
 
   const filteredUsers = useMemo(() => {
@@ -98,7 +98,7 @@ const UserBrowser = () => {
         reversoUrl,
       } = JSON.parse(datosPaso1);
   
-      const res = await fetch(`${BASE_URL}/registro-driver`, {
+      const res = await fetch(`${BASE_URL}/api/registro-driver`, {
         method: "POST",
         headers: { "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,},

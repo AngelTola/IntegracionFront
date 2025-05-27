@@ -78,7 +78,7 @@ export default function CompleteProfileModal({
         setBirthDay("");
       }
     }
-  }, [birthMonth, birthYear]);
+  }, [birthDay, birthMonth, birthYear]);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -148,7 +148,7 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
       return;
     } else {
       try {
-        const res = await fetch(`${BASE_URL}/check-phone`, {
+        const res = await fetch(`${BASE_URL}/api/check-phone`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ telefono: cleanPhone }),
@@ -172,7 +172,7 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
     }
     setError("");
     try {
-      const res = await fetch(`${BASE_URL}/update-profile`, {
+      const res = await fetch(`${BASE_URL}/api/update-profile`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -444,7 +444,7 @@ if (hasErrors) return; // Si hay al menos un error, no continúa
               const email = localStorage.getItem("google_email");
               if (email) {
                 await fetch(
-                  `${BASE_URL}/delete-incomplete-user`,
+                  `${BASE_URL}/api/delete-incomplete-user`,
                   {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" },

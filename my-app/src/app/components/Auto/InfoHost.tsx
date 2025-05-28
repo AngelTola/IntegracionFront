@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Usuario } from '@/types/auto';
+import Link from "next/link";
 
 interface Props {
   usuario: Usuario;
@@ -30,7 +31,25 @@ export default function InfoHost({ usuario, marca, modelo }: Props) {
       console.error('Error al redirigir a WhatsApp:', err);
       setError(true);
     }
-  };  
+  };
+
+  const handleViewProfile = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Primero abrimos la página con los parámetros
+    const queryParams = new URLSearchParams({
+      nombre: usuario.nombreCompleto,
+      telefono: usuario.telefono || '',
+      direccion: usuario.direccion || '',
+      email: usuario.email || '',
+      edad: '21',
+      marca: marca || '',
+      modelo: modelo || ''
+    }).toString();
+    
+    const paramsUrl = `/detalleHost/${usuario.idUsuario}?${queryParams}`;
+    window.open(paramsUrl, '_blank');
+  };
 
   return (
     <div className="bg-[#f5f5f5] p-6 rounded-2xl shadow-md border-2 border-black">
@@ -78,6 +97,18 @@ export default function InfoHost({ usuario, marca, modelo }: Props) {
         </div>
       )}
 
+      <div className="flex justify-center mt-4">
+       <Link
+          href={`/detalleHost/${usuario.idUsuario}`}
+          onClick={handleViewProfile}
+          className="bg-orange-400 hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-full shadow-md transition"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Ver perfil
+        </Link>
+
+      </div>
     </div>
   );
 }

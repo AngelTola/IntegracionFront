@@ -1,6 +1,5 @@
 'use client';
 
-import Navbar from '@/app/components/navbar/Navbar';
 import GaleriaImagenes from '@/app/components/Auto/GaleriaImagenes';
 import Caracteristicas from '@/app/components/Auto/Caracteristicas';
 import InfoHost from '@/app/components/Auto/InfoHost';
@@ -38,8 +37,6 @@ export default function DetalleCocheCliente({ auto }: Props) {
     : 0;
   return (
     <>
-      <Navbar />
-
       <SolicitudReserva
         mostrar={mostrarSolicitudResercva}
         onClose={() => setMostrarModalSolicitud(false)}

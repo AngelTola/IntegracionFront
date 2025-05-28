@@ -91,6 +91,16 @@ export interface Auto {
   vecesAlquilado?: number | null;
 }
 
+export interface AutoConDisponibilidad {
+  idAuto: number;
+  modelo: string;
+  marca: string;
+  precio: string;
+  calificacionPromedio?: number | null;
+  disponible: boolean;
+  imagenes: Imagen[];
+}
+
 export interface Imagen {
   idImagen: number;
   idAuto: number;
@@ -167,16 +177,20 @@ export interface HistorialMantenimiento {
 
 export interface Comentario {
   idComentario: number;
-  idAuto: number;
-  auto: Auto;
-  idUsuario: number;
-  usuario: Usuario;
-  contenido?: string | null;
+  idCalificador: number;
+  nombre: string;
+  apellido: string;
+  contenido: string;
+  comentario: string;
   calificacion: number;
-  fechaCreacion: Date | string;
-  idReserva?: number | null;
-  reserva?: Reserva | null;
+  puntuacion: number;
+  fechaCreacion: string;
+  usuario: {
+  nombre: string;
+  apellido: string;
+};
 }
+
 
 export interface CalificacionUsuario {
   idCalificacion: number;
@@ -190,9 +204,11 @@ export interface CalificacionUsuario {
   idReserva: number;
   reserva: Reserva;
   tipoCalificacion: TipoCalificacionUsuario;
+  nombre: string;
+  apellido: string;
 }
 
 // Tipos utilitarios para relaciones parciales
-export type UsuarioPreview = Pick<Usuario, 'idUsuario' | 'nombreCompleto' | 'email'>;
+export type UsuarioPreview = Pick<Usuario, 'idUsuario' | 'nombre' | 'apellido' | 'email'>;
 export type AutoPreview = Pick<Auto, 'idAuto' | 'marca' | 'modelo' | 'precioRentaDiario' | 'imagenes'>;
 export type ReservaPreview = Pick<Reserva, 'idReserva' | 'fechaInicio' | 'fechaFin' | 'estado'>;

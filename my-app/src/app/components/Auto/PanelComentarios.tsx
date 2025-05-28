@@ -155,8 +155,6 @@ export default function PanelComentarios({ mostrar, onClose, comentarios, marca,
           </div>
         </div>
 
-
-
         {([5, 4, 3, 2, 1] as const).map((estrella) => (
           <div key={estrella} className="flex items-center gap-2 mb-1">
             <div className="bg-[#002a5c] text-white w-8 h-8 flex items-center justify-center rounded">{estrella}</div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback  } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import LoginModal from '@/app/components/auth/authInicioSesion/LoginModal';
@@ -76,6 +76,8 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
   } | null>(null);
 
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const user = useUser();
 
   const updateAuthState = useCallback(() => {
@@ -150,8 +152,16 @@ export default function DynamicNavbar({ onBecomeHost, onBecomeDriver }: DynamicN
 
   const handleNavigation = (index: number) => {
     setActiveBtn(index);
+
     if (index === 0) {
-      router.push('/home');
+      if (searchParams.get('mostrarCarrusel') === 'true') {
+        document.getElementById('carousel')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      } else {
+        router.push('/?mostrarCarrusel=true');
+      }
     } else if (index === 1) {
       router.push('/autos');
     }
